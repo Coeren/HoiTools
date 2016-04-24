@@ -46,16 +46,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core.cs" />
-    <Compile Include="Paths.xaml.cs">
-      <DependentUpon>Paths.xaml</DependentUpon>
+    <Compile Include="CommonSettings.xaml.cs">
+      <DependentUpon>CommonSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Paths.xaml">
+    <Page Include="CommonSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UIControls\UIControls.csproj">
+      <Project>{562cdf05-d662-4b71-ab99-eed2ac613c1e}</Project>
+      <Name>UIControls</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

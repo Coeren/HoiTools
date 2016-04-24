@@ -7,14 +7,34 @@ using System.Configuration;
 
 namespace PersistentLayer
 {
-    public class Core
+    public sealed class Core
     {
-        public Core()
+        private static readonly Lazy<Core> _lazy = new Lazy<Core>(() => new Core());
+        public static Core Instance { get { return _lazy.Value; } }
+
+        public string RootFolder
         {
-            if (ConfigurationManager.AppSettings["Texts"] != null)
-                ;
-            if (ConfigurationManager.AppSettings["Tech"] != null)
-                ;
+            get { return ConfigurationManager.AppSettings["RootFolder"]; }
+            set
+            {
+                //ConfigurationManager.AppSettings["RootFolder"] = value;
+                var cfg = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                var settings = cfg.AppSettings.Settings;
+                if (settings["RootFolder"] == null)
+                {
+                    settings.Add("RootFolder", value);
+                }
+                else
+                {
+                    settings["RootFolder"].Value = value;
+                }
+                cfg.Save();
+                ConfigurationManager.RefreshSection(cfg.AppSettings.SectionInformation.Name);
+            }
+        }
+
+        private Core()
+        {
         }
     }
     internal class TextData

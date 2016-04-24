@@ -12,7 +12,7 @@ namespace UIControls
         public static readonly DependencyProperty PathProperty =
             DependencyProperty.Register("Path", typeof(string), typeof(PathSelector), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
         public static readonly DependencyProperty SelectFolderProperty = DependencyProperty.Register("SelectFolder", typeof(bool), typeof(PathSelector));
-        public static readonly DependencyProperty HintProperty = DependencyProperty.Register("Hint", typeof(string), typeof(PathSelector));
+        public static readonly DependencyProperty PromptProperty = DependencyProperty.Register("Prompt", typeof(string), typeof(PathSelector));
 
         public bool SelectFolder
         {
@@ -25,10 +25,10 @@ namespace UIControls
             set { SetValue(PathProperty, value); }
         }
 
-        public string Hint
+        public string Prompt
         {
-            get { return (string)GetValue(HintProperty); }
-            set { SetValue(HintProperty, value); }
+            get { return (string)GetValue(PromptProperty); }
+            set { SetValue(PromptProperty, value); }
         }
 
         public PathSelector()
@@ -36,18 +36,19 @@ namespace UIControls
             InitializeComponent();
         }
 
+        private string _hint = "Enter path or select on file tree";
+
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            if (Hint == null || Hint == "")
+            if (Path == null || Path == "")
             {
-                Hint = "Enter path or select on file tree";
+                Path = _hint;
             }
-            Path = Hint;
         }
 
         private void path_GotFocus(object sender, RoutedEventArgs e)
         {
-            if (Path == Hint)
+            if (Path == _hint)
             {
                 Path = "";
             }
@@ -57,7 +58,7 @@ namespace UIControls
         {
             if ((sender as TextBox)?.Text == "")
             {
-                Path = Hint;
+                Path = _hint;
             }
         }
 
@@ -65,6 +66,10 @@ namespace UIControls
         {
             CommonOpenFileDialog dlg = new CommonOpenFileDialog();
             dlg.IsFolderPicker = SelectFolder;
+            if (Path != "")
+            {
+                dlg.InitialDirectory = Path;
+            }
             if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
             {
                 Path = dlg.FileName;

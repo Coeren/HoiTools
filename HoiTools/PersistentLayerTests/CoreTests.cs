@@ -12,7 +12,7 @@ namespace PersistentLayerTests
         [TestMethod]
         public void Creation()
         {
-            Core core = new Core();
+            Core core = Core.Instance;
         }
     }
 }

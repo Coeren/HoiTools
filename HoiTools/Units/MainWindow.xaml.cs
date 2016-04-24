@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using PersistentLayer;
+using System.Configuration;
+using System.Windows;
 
 namespace Units
 {
@@ -10,6 +12,14 @@ namespace Units
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void button_Click(object sender, RoutedEventArgs e)
+        {
+            string r = ConfigurationManager.AppSettings["RootFolder"];
+            string r2 = Core.Instance.RootFolder;
+
+            _commonSettings.Apply();
         }
     }
 }

@@ -16,13 +16,20 @@ using System.Windows.Shapes;
 namespace PersistentLayer
 {
     /// <summary>
-    /// Interaction logic for Paths.xaml
+    /// Interaction logic for CommonSettings.xaml
     /// </summary>
-    public partial class Paths : UserControl
+    public partial class CommonSettings : UserControl
     {
-        public Paths()
+        public CommonSettings()
         {
             InitializeComponent();
+
+            _rootPath.Path = Core.Instance.RootFolder;
+        }
+
+        public void Apply()
+        {
+            Core.Instance.RootFolder = _rootPath.Path;
         }
     }
 }

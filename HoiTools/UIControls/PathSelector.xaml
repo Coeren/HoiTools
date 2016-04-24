@@ -5,8 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:UIControls"
              mc:Ignorable="d" Height="20" Loaded="UserControl_Loaded">
-    <StackPanel Orientation="Horizontal">
-        <TextBox x:Name="path" TextWrapping="Wrap" Text="{Binding Path=Path, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}" GotFocus="path_GotFocus" LostFocus="path_LostFocus" Width="169"/>
-        <Button x:Name="button" Content="..." Width="{Binding Path=Height, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}" Click="button_Click"/>
-    </StackPanel>
+    <DockPanel>
+        <Button DockPanel.Dock="Right" x:Name="button" Content="..." Width="{Binding Path=Height, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}" Click="button_Click"/>
+        <TextBlock x:Name="textBlock" Margin="0,0,5,0" Text="{Binding Path=Prompt, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}"/>
+        <TextBox x:Name="path" Text="{Binding Path=Path, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}" GotFocus="path_GotFocus" LostFocus="path_LostFocus"/>
+    </DockPanel>
 </UserControl>

@@ -36,6 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -96,6 +97,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\PersistentLayer\PersistentLayer.csproj">
+      <Project>{C5DE0051-A6CF-4224-9590-3C63B066F3D2}</Project>
+      <Name>PersistentLayer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\UIControls\UIControls.csproj">
       <Project>{562cdf05-d662-4b71-ab99-eed2ac613c1e}</Project>
       <Name>UIControls</Name>
