@@ -24,12 +24,12 @@ namespace PersistentLayer
         {
             InitializeComponent();
 
-            _rootPath.Path = Core.Instance.RootFolder;
+            _rootPath.Path = Core.Configurator.RootFolder;
         }
 
         public void Apply()
         {
-            Core.Instance.RootFolder = _rootPath.Path;
+            Core.Configurator.RootFolder = _rootPath.Path;
         }
     }
 }

@@ -16,10 +16,12 @@ namespace Units
 
         private void button_Click(object sender, RoutedEventArgs e)
         {
-            string r = ConfigurationManager.AppSettings["RootFolder"];
-            string r2 = Core.Instance.RootFolder;
-
             _commonSettings.Apply();
+        }
+
+        private void button1_Click(object sender, RoutedEventArgs e)
+        {
+            Core.Instance.Test();
         }
     }
 }

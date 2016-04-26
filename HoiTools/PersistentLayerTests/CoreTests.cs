@@ -10,9 +10,20 @@ namespace PersistentLayerTests
     public class CoreTests
     {
         [TestMethod]
-        public void Creation()
+        [ExpectedException(typeof(System.InvalidOperationException))]
+        public void CreationNotConfigured()
         {
-            Core core = Core.Instance;
+            ICore core = Core.Instance;
+        }
+
+        [TestMethod]
+        public void CreationConfigured()
+        {
+            ICoreConfigurator conf = Core.Configurator;
+            conf.RootFolder = @"D:\Games\HOI\mod-CORE";
+
+            ICore core = Core.Instance;
+            core.Test();
         }
     }
 }

@@ -40,7 +40,7 @@ namespace UIControls
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            if (Path == null || Path == "")
+            if (string.IsNullOrEmpty(Path))
             {
                 Path = _hint;
             }
