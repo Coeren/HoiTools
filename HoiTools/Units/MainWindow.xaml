@@ -7,11 +7,10 @@
         xmlns:UIControls="clr-namespace:UIControls;assembly=UIControls" xmlns:PersistentLayer="clr-namespace:PersistentLayer;assembly=PersistentLayer" x:Class="Units.MainWindow"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
-    <Grid>
-
-        <PersistentLayer:CommonSettings x:Name="_commonSettings" HorizontalAlignment="Left" Margin="10,10,10,0" VerticalAlignment="Top" Height="41" Width="497"/>
-        <Button x:Name="button" Content="OK" HorizontalAlignment="Left" Margin="432,56,10,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="button_Click"/>
-        <Button x:Name="button1" Content="Button" HorizontalAlignment="Left" Margin="432,81,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.539,-1.522" Click="button1_Click"/>
-
-    </Grid>
+    <DockPanel>
+        <PersistentLayer:CommonSettings x:Name="_commonSettings" DockPanel.Dock="Top" Margin="10,10,10,10" Width="Auto" Height="Auto"/>
+        <Button x:Name="button" DockPanel.Dock="Top" Content="OK" HorizontalAlignment="Right" Margin="10,0,10,10" VerticalAlignment="Top" Width="75" IsDefault="True" Click="button_Click"/>
+        <Button x:Name="button1" DockPanel.Dock="Top" Content="Button" Margin="10,0,10,10" VerticalAlignment="Top" Width="75" Click="button1_Click" HorizontalAlignment="Right"/>
+        <TextBox x:Name="textBox" DockPanel.Dock="Bottom" Height="69" Margin="10,10,10,10" TextWrapping="Wrap" Text="{Binding Path=Log, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Bottom" IsReadOnly="True" TextChanged="textBox_TextChanged" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
+    </DockPanel>
 </Window>

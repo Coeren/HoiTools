@@ -97,6 +97,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{0229c8fc-4d05-4512-b766-268050aa99b2}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PersistentLayer\PersistentLayer.csproj">
       <Project>{C5DE0051-A6CF-4224-9590-3C63B066F3D2}</Project>
       <Name>PersistentLayer</Name>

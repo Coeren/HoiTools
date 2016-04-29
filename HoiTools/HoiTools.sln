@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UIControls", "UIControls\UI
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{2744373D-7DC0-4D1E-AAF2-91E19CB66726}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{0229C8FC-4D05-4512-B766-268050AA99B2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{562CDF05-D662-4B71-AB99-EED2AC613C1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{562CDF05-D662-4B71-AB99-EED2AC613C1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{562CDF05-D662-4B71-AB99-EED2AC613C1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0229C8FC-4D05-4512-B766-268050AA99B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0229C8FC-4D05-4512-B766-268050AA99B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0229C8FC-4D05-4512-B766-268050AA99B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0229C8FC-4D05-4512-B766-268050AA99B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,5 +54,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{7D561DBF-6CB8-464F-A00D-2135AB79E58E} = {2744373D-7DC0-4D1E-AAF2-91E19CB66726}
 		{F42746D7-3CD5-4F74-8A56-DB72FE5D023B} = {2744373D-7DC0-4D1E-AAF2-91E19CB66726}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.Common.6.0.1304.0\lib\NET45;packages\EnterpriseLibrary.Logging.6.0.1304.0\lib\NET45
 	EndGlobalSection
 EndGlobal

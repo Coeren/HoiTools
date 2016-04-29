@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Configuration;
 using System.IO;
+using System.Diagnostics;
 
 namespace PersistentLayer
 {
@@ -91,12 +90,14 @@ namespace PersistentLayer
                         var a = s.Split(';');
                         if (a.Count() < 2 || string.IsNullOrWhiteSpace(a[0]) || string.IsNullOrWhiteSpace(a[1]))
                         {
+                            Trace.WriteLine(InternalConstants.ModelsPath + ": cannot parse '" + s + "'");
                             continue;
                         }
 
                         var aa = a[0].Split('_');
                         if (aa.Count() != 3 && aa.Count() != 4)
                         {
+                            Trace.WriteLine(InternalConstants.ModelsPath + ": cannot parse '" + s + "'");
                             continue;
                         }
 
@@ -109,6 +110,7 @@ namespace PersistentLayer
                         int type, id;
                         if (!int.TryParse(aa[1 + shift], out type) || !Enum.IsDefined(typeof(UnitTypes), type) || !int.TryParse(aa[2 + shift], out id))
                         {
+                            Trace.WriteLine(InternalConstants.ModelsPath + ": cannot parse '" + s + "'");
                             continue;
                         }
                         string country = aa[0 + shift];

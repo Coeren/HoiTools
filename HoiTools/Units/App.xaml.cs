@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Common;
+using System.Diagnostics;
 using System.Windows;
 
 namespace Units
@@ -13,5 +9,14 @@ namespace Units
     /// </summary>
     public partial class App : Application
     {
+        private readonly StringTextListener _listener = new StringTextListener();
+
+        public App()
+        {
+            Trace.Listeners.Add(_listener);
+        }
+
+        public StringTextListener Log { get { return _listener; } }
+        static public App Instance { get { return Current as App; } }
     }
 }
