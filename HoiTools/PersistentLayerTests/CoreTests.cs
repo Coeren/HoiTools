@@ -24,7 +24,6 @@ namespace PersistentLayerTests
 
             IModels models = Core.Models;
             Assert.IsNotNull(models);
-            Assert.IsNotNull(models.ModelType(UnitTypes.Infantry).Model(1));
         }
     }
 }

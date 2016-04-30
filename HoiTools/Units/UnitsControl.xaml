@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Units"
+             xmlns:pl="clr-namespace:PersistentLayer;assembly=PersistentLayer"
              mc:Ignorable="d" d:DesignWidth="416.053" d:DesignHeight="280.144">
     <!--<Grid>
         <TabControl x:Name="tabControl"/>
@@ -15,12 +16,12 @@
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
 
-        <ListBox x:Name="lbTypes" Grid.Column="0" ItemsSource="{Binding Path=(pl:UnitTypes)}"/>
-        <ListBox x:Name="lbModels" Grid.Column="1"/>
-        <DataGrid x:Name="dataGrid" Grid.Column="2" IsEnabled="False">
+        <ListBox x:Name="lbTypes" Grid.Column="0" ItemsSource="{Binding Path=Types, Mode=OneWay}" SelectedItem="{Binding Path=SelectedType, Mode=TwoWay}"/>
+        <ListBox x:Name="lbModels" Grid.Column="1" ItemsSource="{Binding Path=Models, Mode=OneWay}" SelectedItem="{Binding Path=SelectedModel, Mode=TwoWay}"/>
+        <DataGrid x:Name="dataGrid" Grid.Column="2" ItemsSource="{Binding Path=SelectedModel.Specifications, Mode=OneWay}">
             <DataGrid.Columns>
-                <DataGridTextColumn Binding="{x:Null}" ClipboardContentBinding="{x:Null}" Width="*"/>
-                <DataGridTextColumn Binding="{x:Null}" ClipboardContentBinding="{x:Null}"/>
+                <DataGridTextColumn Binding="{Binding Key}" Header="Name" Width="*"/>
+                <DataGridTextColumn Binding="{Binding Value}" Header="{Binding ElementName=lbModels, Path=SelectedItem}"/>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

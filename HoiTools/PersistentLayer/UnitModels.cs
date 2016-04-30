@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 
 namespace PersistentLayer
@@ -8,12 +9,12 @@ namespace PersistentLayer
     {
         Infantry = 0,
         Cavalry,
-        Motorised,
+        Motorized,
         Mechanized,
         Panzer,
         Paratrooper,
         Marine,
-        Bergsjager,
+        Bergsjaeger,
         Militia,
         Fighter,
         Strategic_Bomber,
@@ -22,7 +23,7 @@ namespace PersistentLayer
         Naval_Bomber,
         Torpedo_Plane,
         Transport_Plane,
-        FlyingBomb,
+        Flying_Bomb,
         Flying_Rocket,
         Battleship,
         Cruiser,
@@ -42,12 +43,12 @@ namespace PersistentLayer
     public interface IModel
     {
         string Name { get; }
+        ReadOnlyDictionary<string, double> Specifications { get; }
     }
 
     public interface IModelType
     {
-        IReadOnlyCollection<int> Ids { get; }
-        IModel Model(int id);
+        IReadOnlyCollection<IModel> Models { get; }
     }
 
     public interface IModels
@@ -58,6 +59,8 @@ namespace PersistentLayer
 
     internal class Model : IModel
     {
+        public override string ToString() { return Name; }
+
         public string Name
         {
             get
@@ -73,6 +76,8 @@ namespace PersistentLayer
                 }
             }
         }
+
+        public ReadOnlyDictionary<string, double> Specifications { get { return new ReadOnlyDictionary<string, double>(_specifications); } }
 
         internal Model(string country, string name) { SetName(country, name); }
         internal void SetName(string country, string name)
@@ -90,14 +95,18 @@ namespace PersistentLayer
                 _namesByCountry.Add(country, name);
             }
         }
+        internal void SetSpec(string key, double value)
+        {
+            _specifications[key] = value;
+        }
 
         private Dictionary<string, string> _namesByCountry = new Dictionary<string, string>();
+        private Dictionary<string, double> _specifications = new Dictionary<string, double>();
     }
 
     internal class ModelType : IModelType
     {
-        public IReadOnlyCollection<int> Ids { get { return _modelNames.Keys; } }
-        public IModel Model(int id) { return _modelNames[id]; }
+        public IReadOnlyCollection<IModel> Models { get { return _modelNames.Values; } }
 
         internal ModelType(int id, string name, string country = Constants.DefaultCountry) { SetModel(id, name, country); }
 
@@ -111,6 +120,16 @@ namespace PersistentLayer
             {
                 _modelNames.Add(id, new Model(country, name));
             }
+        }
+        internal void SetSpec(int id, string key, double value)
+        {
+            if (!_modelNames.ContainsKey(id))
+            {
+                Trace.WriteLine("No model description for model id " + id);
+                _modelNames.Add(id, new Model(Constants.DefaultCountry, "Unknown"));
+            }
+
+            _modelNames[id].SetSpec(key, value);
         }
 
         private Dictionary<int, Model> _modelNames = new Dictionary<int, Model>();
@@ -135,6 +154,16 @@ namespace PersistentLayer
             {
                 _modelTypes.Add(type, new ModelType(id, name, country));
             }
+        }
+        internal void SetSpec(UnitTypes type, int id, string key, double value)
+        {
+            if (!_modelTypes.ContainsKey(type))
+            {
+                Trace.WriteLine("No type description for type " + type);
+                _modelTypes.Add(type, new ModelType(id, "Unknown", Constants.DefaultCountry));
+            }
+
+            _modelTypes[type].SetSpec(id, key, value);
         }
 
         private Dictionary<UnitTypes, ModelType> _modelTypes = new Dictionary<UnitTypes, ModelType>();

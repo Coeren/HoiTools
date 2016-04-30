@@ -5,6 +5,7 @@ using System.Configuration;
 using System.IO;
 using System.Diagnostics;
 using System.ComponentModel;
+using System.Globalization;
 
 namespace PersistentLayer
 {
@@ -60,6 +61,7 @@ namespace PersistentLayer
         {
             Trace.WriteLine(file + ": parse error on '" + message + "'");
         }
+        private enum ModelSpecsState { File, Spec }
 
         private void Init(string root)
         {
@@ -82,6 +84,7 @@ namespace PersistentLayer
                 ParseTextData(root);
                 ParseModelNames(root);
                 ParseCountries(root);
+                ParseModelSpecifications(root);
             }
             catch (Exception)
             {
@@ -96,11 +99,103 @@ namespace PersistentLayer
             CountriesChanged?.Invoke(null, EventArgs.Empty);
         }
 
+        private void ParseModelSpecifications(string root)
+        {
+            CultureInfo culture = CultureInfo.CreateSpecificCulture("en-US");
+            foreach (UnitTypes type in _models.Types)
+            {
+                string filename = root + Constants.ModelSpecsPath + type + ".txt";
+                if (!File.Exists(filename))
+                {
+                    Trace.WriteLine("Cannot find specs file for " + type);
+                    continue;
+                }
+
+                ModelSpecsState state = ModelSpecsState.File;
+                int modelId = -1;
+                using (StreamReader sr = new StreamReader(filename))
+                {
+                    string s;
+                    while ((s = sr.ReadLine()) != null)
+                    {
+                        int p = s.IndexOf('#');
+                        if (p != -1)
+                        {
+                            s = s.Remove(p);
+                        }
+                        s = s.Trim();
+
+                        switch (state)
+                        {
+                            case ModelSpecsState.File:
+                                if (s.StartsWith("model"))
+                                {
+                                    state = ModelSpecsState.Spec;
+                                    modelId++;
+                                    if (!s.EndsWith("{") || s.IndexOf('{') != s.LastIndexOf('{'))
+                                    {
+                                        throw new InvalidOperationException("Bad format in '" + filename + "': " + s);
+                                    }
+                                }
+                                else if (!string.IsNullOrEmpty(s))
+                                {
+                                    Trace.WriteLine("Bad format in '" + filename + "', possible loss of data:");
+                                    Trace.Indent();
+                                    Trace.WriteLine(s);
+                                    Trace.Unindent();
+                                }
+                                break;
+                            case ModelSpecsState.Spec:
+                                if (s.StartsWith("}"))
+                                {
+                                    state = ModelSpecsState.File;
+                                }
+                                else if (s.IndexOf('}') != -1)
+                                {
+                                    throw new InvalidOperationException("Bad format in '" + filename + "': " + s);
+                                }
+                                else
+                                {
+                                    var a = s.Split('=');
+                                    if (a.Count() != 2)
+                                    {
+                                        break;
+                                    }
+
+                                    string k = a[0].Trim();
+                                    string kh;
+                                    if (_textData.TryGetValue(k, out kh))
+                                    {
+                                        k = kh;
+                                    }
+                                    double v;
+                                    if (!double.TryParse(a[1], NumberStyles.Float, culture, out v))
+                                    {
+                                        Trace.WriteLine("Bad format in '" + filename + "', possible loss of data:");
+                                        Trace.Indent();
+                                        Trace.WriteLine(s);
+                                        Trace.Unindent();
+                                    }
+                                    else
+                                    {
+                                        _models.SetSpec(type, modelId, k, v);
+                                    }
+                                }
+                                break;
+
+                            default:
+                                throw new InvalidOperationException("Unknown state while parsing '" + filename + "'");
+                        }
+                    }
+                }
+            }
+        }
+
         private void ParseModelNames(string root)
         {
             try
             {
-                using (StreamReader sr = new StreamReader(root + InternalConstants.ModelsPath))
+                using (StreamReader sr = new StreamReader(root + Constants.ModelsPath))
                 {
                     string s;
                     while ((s = sr.ReadLine()) != null)
@@ -113,14 +208,14 @@ namespace PersistentLayer
                         var a = s.Split(';');
                         if (a.Count() < 2 || string.IsNullOrWhiteSpace(a[0]) || string.IsNullOrWhiteSpace(a[1]))
                         {
-                            ParseError(InternalConstants.ModelsPath, s);
+                            ParseError(Constants.ModelsPath, s);
                             continue;
                         }
 
                         var aa = a[0].Split('_');
                         if (aa.Count() != 3 && aa.Count() != 4)
                         {
-                            ParseError(InternalConstants.ModelsPath, s);
+                            ParseError(Constants.ModelsPath, s);
                             continue;
                         }
 
@@ -133,7 +228,7 @@ namespace PersistentLayer
                         int type, id;
                         if (!int.TryParse(aa[1 + shift], out type) || !Enum.IsDefined(typeof(UnitTypes), type) || !int.TryParse(aa[2 + shift], out id))
                         {
-                            ParseError(InternalConstants.ModelsPath, s);
+                            ParseError(Constants.ModelsPath, s);
                             continue;
                         }
                         string country = aa[0 + shift];
@@ -152,7 +247,7 @@ namespace PersistentLayer
         {
             try
             {
-                using (StreamReader sr = new StreamReader(root + InternalConstants.TextPath))
+                using (StreamReader sr = new StreamReader(root + Constants.TextPath))
                 {
                     string s;
                     while ((s = sr.ReadLine()) != null)
@@ -169,7 +264,7 @@ namespace PersistentLayer
                         }
                         else
                         {
-                            ParseError(InternalConstants.TextPath, s);
+                            ParseError(Constants.TextPath, s);
                         }
                     }
                 }
@@ -184,7 +279,7 @@ namespace PersistentLayer
         {
             try
             {
-                using (StreamReader sr = new StreamReader(root + InternalConstants.CountriesPath))
+                using (StreamReader sr = new StreamReader(root + Constants.CountriesPath))
                 {
                     string s = sr.ReadLine(); // skip header
                     while ((s = sr.ReadLine()) != null)
@@ -203,7 +298,7 @@ namespace PersistentLayer
                         }
                         else
                         {
-                            ParseError(InternalConstants.CountriesPath, s);
+                            ParseError(Constants.CountriesPath, s);
                         }
                     }
                 }
