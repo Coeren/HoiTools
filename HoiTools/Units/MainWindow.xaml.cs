@@ -22,38 +22,22 @@ namespace Units
         {
             InitializeComponent();
 
-            App.Instance.Log.PropertyChanged += Log_PropertyChanged;
-
-            Trace.WriteLine("!!!!!!!!!!!!!! 1111 !!!!!!!!!!!!!!!");
+            App.Log.TraceAdded += OnTraceAdded;
+            Log = App.Log.Trace;
         }
 
-        private void Log_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void OnTraceAdded(string trace)
         {
-            if (e.PropertyName == "Trace")
-            {
-                Log = (sender as StringTextListener).Trace;
-            }
-        }
-
-        private void button_Click(object sender, RoutedEventArgs e)
-        {
-            _commonSettings.Apply();
+            Log += trace;
         }
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-            Trace.WriteLine("!!!!!!!!!!!!!! 2222 !!!!!!!!!!!!!!!");
+            Settings dlg = new Settings();
+            dlg.Owner = this;
+            dlg.ShowDialog();
 
-            try
-            {
-                Core.Instance.Test();
-            }
-            catch (Exception ex)
-            {
-                Trace.WriteLine(ex.Message);
-            }
-
-            Trace.WriteLine("!!!!!!!!!!!!!! 3333 !!!!!!!!!!!!!!!");
+            unitsControl.CreateContents(true);
         }
 
         private void textBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)

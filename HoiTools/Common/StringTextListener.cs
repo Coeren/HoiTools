@@ -5,12 +5,14 @@ using System.Text;
 
 namespace Common
 {
-    public class StringTextListener : TraceListener, INotifyPropertyChanged
+    public class StringTextListener : TraceListener
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
+        public delegate void TraceHandler(string trace);
+
+        public event TraceHandler TraceAdded;
+        protected virtual void OnTraceAdded(string trace)
         {
-            PropertyChanged?.Invoke(this, e);
+            TraceAdded?.Invoke(trace);
         }
 
         private readonly StringBuilder _builder = new StringBuilder();
@@ -19,14 +21,16 @@ namespace Common
 
         public override void Write(string message)
         {
-            _builder.AppendFormat("[{0}] {1}", DateTime.Now, message);
-            OnPropertyChanged(new PropertyChangedEventArgs("Trace"));
+            string trace = string.Format("[{0}] {1}", DateTime.Now, message);
+            _builder.Append(trace);
+            OnTraceAdded(trace);
         }
 
         public override void WriteLine(string message)
         {
-            _builder.AppendFormat("[{0}] {1}", DateTime.Now, message).AppendLine();
-            OnPropertyChanged(new PropertyChangedEventArgs("Trace"));
+            string trace = string.Format("[{0}] {1}\n", DateTime.Now, message);
+            _builder.Append(trace);
+            OnTraceAdded(trace);
         }
     }
 }

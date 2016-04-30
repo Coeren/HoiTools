@@ -4,42 +4,20 @@ using System.Linq;
 using System.Configuration;
 using System.IO;
 using System.Diagnostics;
+using System.ComponentModel;
 
 namespace PersistentLayer
 {
-    public interface ICoreConfigurator
-    {
-        string RootFolder { get; set; }
-    }
-
-    public interface ICore
-    {
-        void Test();
-    }
-
-    public sealed class Core : ICoreConfigurator, ICore
+    public sealed class Core
     {
         private static readonly Lazy<Core> _lazy = new Lazy<Core>(() => new Core());
-        public static ICoreConfigurator Configurator { get { return _lazy.Value; } }
-        public static ICore Instance
-        {
-            get
-            {
-                Core instance = _lazy.Value;
-                if (!instance._inited)
-                {
-                    instance.Init((instance as ICoreConfigurator).RootFolder);
-                }
-                return instance;
-            }
-        }
+        private static Core Instance { get { return _lazy.Value; } }
 
-        string ICoreConfigurator.RootFolder
+        static public string RootFolder
         {
             get { return ConfigurationManager.AppSettings["RootFolder"]; }
             set
             {
-                //ConfigurationManager.AppSettings["RootFolder"] = value;
                 var cfg = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
                 var settings = cfg.AppSettings.Settings;
                 if (settings["RootFolder"] == null)
@@ -53,29 +31,69 @@ namespace PersistentLayer
                 cfg.Save();
                 ConfigurationManager.RefreshSection(cfg.AppSettings.SectionInformation.Name);
 
-                _inited = false;
-                Init(value);
+                Instance.Init(value);
             }
         }
+        static public IModels Models { get { return Instance._models; } }
+        static public IReadOnlyCollection<string> Countries { get { return Instance._countries.Values; } }
+        static internal string CurrentCountryTag { get { return Instance._countryTag; } }
+        static public string CurrentCountry
+        {
+            get { return Instance._countries[Instance._countryTag]; }
+            set { Instance._countryTag = Instance._countryTags[value]; }
+        }
+
 
         private Core()
         {
+            foreach (UnitTypes type in Enum.GetValues(typeof(UnitTypes)))
+            {
+                _models.AddModel(type, 0, "");
+            }
+
+            _countries[Constants.DefaultCountry] = "Common";
+            _countryTags["Common"] = Constants.DefaultCountry;
+            _countryTag = Constants.DefaultCountry;
+        }
+
+        private void ParseError(string file, string message)
+        {
+            Trace.WriteLine(file + ": parse error on '" + message + "'");
         }
 
         private void Init(string root)
         {
-            if (_inited)
-            {
-                throw new InvalidOperationException("Already inited");
-            }
-
             if (string.IsNullOrEmpty(root))
             {
                 throw new InvalidOperationException("Root folder is not set");
             }
 
-            ParseTextData(root);
-            ParseModelNames(root);
+            var textData = _textData;
+            _textData = new Dictionary<string, string>();
+            var models = _models;
+            _models = new Models();
+            var countries = _countries;
+            _countries = new Dictionary<string, string>();
+            var countryTags = _countryTags;
+            _countryTags = new Dictionary<string, string>();
+
+            try
+            {
+                ParseTextData(root);
+                ParseModelNames(root);
+                ParseCountries(root);
+            }
+            catch (Exception)
+            {
+                _textData = textData;
+                _models = models;
+                _countries = countries;
+                _countryTags = countryTags;
+
+                throw;
+            }
+
+            CountriesChanged?.Invoke(null, EventArgs.Empty);
         }
 
         private void ParseModelNames(string root)
@@ -87,17 +105,22 @@ namespace PersistentLayer
                     string s;
                     while ((s = sr.ReadLine()) != null)
                     {
+                        if (s.StartsWith("#EOF"))
+                        {
+                            break;
+                        }
+
                         var a = s.Split(';');
                         if (a.Count() < 2 || string.IsNullOrWhiteSpace(a[0]) || string.IsNullOrWhiteSpace(a[1]))
                         {
-                            Trace.WriteLine(InternalConstants.ModelsPath + ": cannot parse '" + s + "'");
+                            ParseError(InternalConstants.ModelsPath, s);
                             continue;
                         }
 
                         var aa = a[0].Split('_');
                         if (aa.Count() != 3 && aa.Count() != 4)
                         {
-                            Trace.WriteLine(InternalConstants.ModelsPath + ": cannot parse '" + s + "'");
+                            ParseError(InternalConstants.ModelsPath, s);
                             continue;
                         }
 
@@ -110,7 +133,7 @@ namespace PersistentLayer
                         int type, id;
                         if (!int.TryParse(aa[1 + shift], out type) || !Enum.IsDefined(typeof(UnitTypes), type) || !int.TryParse(aa[2 + shift], out id))
                         {
-                            Trace.WriteLine(InternalConstants.ModelsPath + ": cannot parse '" + s + "'");
+                            ParseError(InternalConstants.ModelsPath, s);
                             continue;
                         }
                         string country = aa[0 + shift];
@@ -121,7 +144,7 @@ namespace PersistentLayer
             }
             catch (Exception e)
             {
-                throw new IOException("Cannot parse models data", e);
+                throw new IOException("Error accessing models data", e);
             }
         }
 
@@ -134,27 +157,72 @@ namespace PersistentLayer
                     string s;
                     while ((s = sr.ReadLine()) != null)
                     {
+                        if (s.StartsWith("#EOF"))
+                        {
+                            break;
+                        }
+
                         var a = s.Split(';');
                         if (a.Count() >= 2 && !string.IsNullOrWhiteSpace(a[0]) && !string.IsNullOrWhiteSpace(a[1]))
                         {
                             _textData[a[0]] = a[1];
+                        }
+                        else
+                        {
+                            ParseError(InternalConstants.TextPath, s);
                         }
                     }
                 }
             }
             catch (Exception e)
             {
-                throw new IOException("Cannot parse text data", e);
+                throw new IOException("Error accessing text data", e);
             }
         }
 
-        void ICore.Test()
+        private void ParseCountries(string root)
         {
-        }
+            try
+            {
+                using (StreamReader sr = new StreamReader(root + InternalConstants.CountriesPath))
+                {
+                    string s = sr.ReadLine(); // skip header
+                    while ((s = sr.ReadLine()) != null)
+                    {
+                        if (s.StartsWith("END"))
+                        {
+                            break;
+                        }
 
-        private bool _inited = false;
+                        var a = s.Split(';');
+                        if (a.Count() == 5 && !string.IsNullOrWhiteSpace(a[0]))
+                        {
+                            string country = _textData[a[0]];
+                            _countries[a[0]] = country;
+                            _countryTags[country] = a[0];
+                        }
+                        else
+                        {
+                            ParseError(InternalConstants.CountriesPath, s);
+                        }
+                    }
+                }
+
+                _countries[Constants.DefaultCountry] = "Common";
+                _countryTags["Common"] = Constants.DefaultCountry;
+            }
+            catch (Exception e)
+            {
+                throw new IOException("Error accessing text data", e);
+            }
+        }
 
         private Dictionary<string, string> _textData = new Dictionary<string, string>();
         private Models _models = new Models();
+        private Dictionary<string, string> _countries = new Dictionary<string, string>();
+        private Dictionary<string, string> _countryTags = new Dictionary<string, string>();
+        private string _countryTag = Constants.DefaultCountry;
+
+        static public event EventHandler CountriesChanged;
     }
 }

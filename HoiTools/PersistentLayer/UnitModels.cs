@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace PersistentLayer
 {
@@ -9,58 +10,93 @@ namespace PersistentLayer
         Cavalry,
         Motorised,
         Mechanized,
-        Armor,
+        Panzer,
         Paratrooper,
-        Marines,
-        Mountain,
+        Marine,
+        Bergsjager,
         Militia,
         Fighter,
-        StrategicBomber,
-        MediumBomber,
-        CloseSupport,
-        NavalBomber,
-        CAG,
-        AirTransport,
+        Strategic_Bomber,
+        Tactical_Bomber,
+        Dive_Bomber,
+        Naval_Bomber,
+        Torpedo_Plane,
+        Transport_Plane,
         FlyingBomb,
-        FlyingRocket,
+        Flying_Rocket,
         Battleship,
         Cruiser,
         Destroyer,
         Carrier,
         Submarine,
-        Transport
+        Transport,
+        // brigades
+        AntiAir,
+        AntiTank,
+        Artillery,
+        Engineer,
+        // ???
+        Night_Fighter
     }
 
     public interface IModel
     {
-        string Name(string country = Constants.DefaultCountry);
+        string Name { get; }
     }
 
     public interface IModelType
     {
+        IReadOnlyCollection<int> Ids { get; }
         IModel Model(int id);
     }
 
     public interface IModels
     {
+        IReadOnlyCollection<UnitTypes> Types { get; }
         IModelType ModelType(UnitTypes type);
     }
 
     internal class Model : IModel
     {
-        public string Name(string country = Constants.DefaultCountry)
+        public string Name
         {
-            return _namesByCountry.ContainsKey(country) ? _namesByCountry[country] : _namesByCountry[Constants.DefaultCountry];
+            get
+            {
+                try
+                {
+                    string tag = Core.CurrentCountryTag;
+                    return _namesByCountry.ContainsKey(tag) ? _namesByCountry[tag] : _namesByCountry[Constants.DefaultCountry];
+                }
+                catch (KeyNotFoundException)
+                {
+                    return "Not found";
+                }
+            }
         }
 
         internal Model(string country, string name) { SetName(country, name); }
-        internal void SetName(string country, string name) { _namesByCountry.Add(country, name); }
+        internal void SetName(string country, string name)
+        {
+            if (_namesByCountry.ContainsKey(country))
+            {
+                Trace.WriteLine("Duplicated models: '" + name + "' for country '" + country + "'");
+            }
+            else if (country != Constants.DefaultCountry && !_namesByCountry.ContainsKey(Constants.DefaultCountry))
+            {
+                Trace.WriteLine("National model w/o common: '" + name + "' for country '" + country + "'");
+            }
+            else
+            {
+                _namesByCountry.Add(country, name);
+            }
+        }
 
         private Dictionary<string, string> _namesByCountry = new Dictionary<string, string>();
     }
 
     internal class ModelType : IModelType
     {
+        public IReadOnlyCollection<int> Ids { get { return _modelNames.Keys; } }
         public IModel Model(int id) { return _modelNames[id]; }
 
         internal ModelType(int id, string name, string country = Constants.DefaultCountry) { SetModel(id, name, country); }
@@ -82,6 +118,8 @@ namespace PersistentLayer
 
     internal class Models : IModels
     {
+        public IReadOnlyCollection<UnitTypes> Types { get { return _modelTypes.Keys; } }
+
         public IModelType ModelType(UnitTypes type)
         {
             return _modelTypes[type];
