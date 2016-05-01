@@ -1,6 +1,8 @@
 ﻿using Common;
 using PersistentLayer;
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 
@@ -11,33 +13,91 @@ namespace Units
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static readonly DependencyProperty LogProperty = DependencyProperty.Register("Log", typeof(string), typeof(MainWindow));
-        public string Log
+        public class MVVM : INotifyPropertyChanged
         {
-            get { return (string) GetValue(LogProperty); }
-            private set { SetValue(LogProperty, value); }
+            public event PropertyChangedEventHandler PropertyChanged;
+
+            public string Log { get { return App.Log.Trace; } }
+            public IReadOnlyCollection<string> Countries { get { return Core.Countries; } }
+            public string CurrentCountry
+            {
+                get { return Core.CurrentCountry; }
+                set { Core.CurrentCountry = value; }
+            }
+
+            public bool DelayTrace
+            {
+                set
+                {
+                    if (_delayTrace != value)
+                    {
+                        _delayTrace = value;
+                        if (!_delayTrace)
+                        {
+                            OnPropertyChanged("Log");
+                        }
+                    }
+                }
+            }
+
+            internal MVVM()
+            {
+                Core.DataChanged += Core_DataChanged;
+                App.Log.TraceAdded += OnTraceAdded;
+                OnPropertyChanged("Log");
+            }
+
+            internal void Cleanup()
+            {
+                Core.DataChanged -= Core_DataChanged;
+                App.Log.TraceAdded -= OnTraceAdded;
+            }
+
+            private void Core_DataChanged(object sender, string e)
+            {
+                OnPropertyChanged(e);
+            }
+
+            private void OnTraceAdded(object sender, string trace)
+            {
+                if (!_delayTrace)
+                {
+                    OnPropertyChanged("Log");
+                }
+            }
+
+            private void OnPropertyChanged(string name)
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            }
+
+            private bool _delayTrace = false;
         }
+
+        private MVVM _mvvm = new MVVM();
 
         public MainWindow()
         {
             InitializeComponent();
 
-            App.Log.TraceAdded += OnTraceAdded;
-            Log = App.Log.Trace;
+            DataContext = _mvvm;
         }
 
-        private void OnTraceAdded(string trace)
+        protected override void OnClosed(EventArgs e)
         {
-            Log += trace;
+            base.OnClosed(e);
+
+            _mvvm.Cleanup();
         }
 
-        private void button1_Click(object sender, RoutedEventArgs e)
+        private void Settings_Click(object sender, RoutedEventArgs e)
         {
             Settings dlg = new Settings();
             dlg.Owner = this;
-            dlg.ShowDialog();
 
-            unitsControl.CreateContents(true);
+            _mvvm.DelayTrace = true;
+            dlg.ShowDialog();
+            _mvvm.DelayTrace = false;
         }
 
         private void textBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)

@@ -11,12 +11,11 @@
     <DockPanel>
         <DockPanel DockPanel.Dock="Top">
             <ComboBox x:Name="countryComboBox" HorizontalAlignment="Left" Margin="5,5,0,5" MinWidth="75"
-                      ItemsSource="{Binding Path=(pl:Core.Countries), UpdateSourceTrigger=PropertyChanged}"
-                      SelectedValue="{Binding Path=(pl:Core.CurrentCountry), Mode=TwoWay}"/>
-            <Button x:Name="settingsBtn" Content="Settings" Margin="5,5,5,5" VerticalAlignment="Top" Width="75" Click="button1_Click" HorizontalAlignment="Right"/>
+                      ItemsSource="{Binding Countries}"
+                      SelectedValue="{Binding CurrentCountry, Mode=TwoWay}"/>
+            <Button x:Name="settingsBtn" Content="Settings" Margin="5,5,5,5" VerticalAlignment="Top" Width="75" Click="Settings_Click" HorizontalAlignment="Right"/>
         </DockPanel>
-        <TextBox x:Name="textBox" DockPanel.Dock="Bottom" Height="69" Margin="5,5,5,5" TextWrapping="Wrap" Text="{Binding Path=Log, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Bottom" IsReadOnly="True" TextChanged="textBox_TextChanged" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
+        <TextBox x:Name="textBox" DockPanel.Dock="Bottom" Height="69" Margin="5,5,5,5" TextWrapping="Wrap" Text="{Binding Log, Mode=OneWay}" VerticalAlignment="Bottom" IsReadOnly="True" TextChanged="textBox_TextChanged" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
         <local:UnitsControl x:Name="unitsControl" DockPanel.Dock="Top" Margin="5,0,5,0"/>
-        <!--<TextBox DockPanel.Dock="Top" Margin="5,0,5,0"/>-->
     </DockPanel>
 </Window>

@@ -18,11 +18,17 @@
 
         <ListBox x:Name="lbTypes" Grid.Column="0" ItemsSource="{Binding Path=Types, Mode=OneWay}" SelectedItem="{Binding Path=SelectedType, Mode=TwoWay}"/>
         <ListBox x:Name="lbModels" Grid.Column="1" ItemsSource="{Binding Path=Models, Mode=OneWay}" SelectedItem="{Binding Path=SelectedModel, Mode=TwoWay}"/>
-        <DataGrid x:Name="dataGrid" Grid.Column="2" ItemsSource="{Binding Path=SelectedModel.Specifications, Mode=OneWay}">
-            <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding Key}" Header="Name" Width="*"/>
-                <DataGridTextColumn Binding="{Binding Value}" Header="{Binding ElementName=lbModels, Path=SelectedItem}"/>
-            </DataGrid.Columns>
-        </DataGrid>
+        <Grid  Grid.Column="2">
+            <Grid.Resources>
+                <FrameworkElement  x:Key="ProxyElement" DataContext="{Binding}"/>
+            </Grid.Resources>
+            <ContentControl  Visibility="Collapsed" Content="{StaticResource ProxyElement}"/>
+            <DataGrid x:Name="dataGrid" ItemsSource="{Binding Path=SelectedModel.Specifications, Mode=OneWay}" AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding Key}" Header="Specifications" Width="*"/>
+                    <DataGridTextColumn Binding="{Binding Value}" Header="{Binding DataContext.SelectedModel, Source={StaticResource ProxyElement}}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
     </Grid>
 </UserControl>

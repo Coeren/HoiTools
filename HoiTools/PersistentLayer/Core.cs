@@ -41,7 +41,11 @@ namespace PersistentLayer
         static public string CurrentCountry
         {
             get { return Instance._countries[Instance._countryTag]; }
-            set { Instance._countryTag = Instance._countryTags[value]; }
+            set
+            {
+                Instance._countryTag = Instance._countryTags[value];
+                DataChanged?.Invoke(null, "CurrentCountry");
+            }
         }
 
 
@@ -96,7 +100,7 @@ namespace PersistentLayer
                 throw;
             }
 
-            CountriesChanged?.Invoke(null, EventArgs.Empty);
+            DataChanged?.Invoke(null, "Countries");
         }
 
         private void ParseModelSpecifications(string root)
@@ -318,6 +322,6 @@ namespace PersistentLayer
         private Dictionary<string, string> _countryTags = new Dictionary<string, string>();
         private string _countryTag = Constants.DefaultCountry;
 
-        static public event EventHandler CountriesChanged;
+        static public event EventHandler<string> DataChanged;
     }
 }

@@ -7,12 +7,10 @@ namespace Common
 {
     public class StringTextListener : TraceListener
     {
-        public delegate void TraceHandler(string trace);
-
-        public event TraceHandler TraceAdded;
+        public event EventHandler<string> TraceAdded;
         protected virtual void OnTraceAdded(string trace)
         {
-            TraceAdded?.Invoke(trace);
+            TraceAdded?.Invoke(this, trace);
         }
 
         private readonly StringBuilder _builder = new StringBuilder();
