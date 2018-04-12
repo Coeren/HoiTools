@@ -73,6 +73,21 @@ namespace Units
                 }
             }
 
+            public bool ModeCompare
+            {
+                get => _modeCompare;
+                set
+                {
+                    if (_modeCompare != value)
+                    {
+                        bool old = _modeCompare;
+                        _modeCompare = value;
+                        OnPropertyChanged("ModeCompare");
+                    }
+                }
+            }
+
+            private bool _modeCompare = false;
             private UnitTypes _selectedType;
             private IModel _selectedModel;
         }
@@ -84,6 +99,8 @@ namespace Units
         }
 
         private UnitsMVVM _mvvm = new UnitsMVVM();
+
+        public UnitsMVVM Mvvm { get => _mvvm; }
 
         public UnitsControl()
         {

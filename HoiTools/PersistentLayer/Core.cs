@@ -47,6 +47,12 @@ namespace PersistentLayer
                 DataChanged?.Invoke(null, "CurrentCountry");
             }
         }
+        static public void Prepare()
+        {
+            string root = RootFolder;
+            if (!string.IsNullOrEmpty(root))
+                Instance.Init(root);
+        }
 
 
         private Core()

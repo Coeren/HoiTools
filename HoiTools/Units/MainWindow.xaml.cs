@@ -24,7 +24,6 @@ namespace Units
                 get { return Core.CurrentCountry; }
                 set { Core.CurrentCountry = value; }
             }
-
             public bool DelayTrace
             {
                 set
@@ -79,6 +78,7 @@ namespace Units
         public MainWindow()
         {
             InitializeComponent();
+            Core.Prepare();
 
             DataContext = _mvvm;
         }

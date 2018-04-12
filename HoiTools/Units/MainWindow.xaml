@@ -4,8 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Units"
-        xmlns:pl="clr-namespace:PersistentLayer;assembly=PersistentLayer"
-        x:Class="Units.MainWindow"
+    x:Class="Units.MainWindow"
         mc:Ignorable="d"
         Title="MainWindow" Height="387.812" Width="525">
     <DockPanel>
@@ -13,6 +12,7 @@
             <ComboBox x:Name="countryComboBox" HorizontalAlignment="Left" Margin="5,5,0,5" MinWidth="75"
                       ItemsSource="{Binding Countries}"
                       SelectedValue="{Binding CurrentCountry, Mode=TwoWay}"/>
+            <CheckBox Content="Compare" Margin="5,8,0,5" IsChecked="{Binding ElementName=unitsControl, Path=Mvvm.ModeCompare}" />
             <Button x:Name="settingsBtn" Content="Settings" Margin="5,5,5,5" VerticalAlignment="Top" Width="75" Click="Settings_Click" HorizontalAlignment="Right"/>
         </DockPanel>
         <TextBox x:Name="textBox" DockPanel.Dock="Bottom" Height="69" Margin="5,5,5,5" TextWrapping="Wrap" Text="{Binding Log, Mode=OneWay}" VerticalAlignment="Bottom" IsReadOnly="True" TextChanged="textBox_TextChanged" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
