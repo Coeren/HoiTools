@@ -104,5 +104,10 @@ namespace Units
         {
             textBox.ScrollToEnd();
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            unitsControl.Compare();
+        }
     }
 }

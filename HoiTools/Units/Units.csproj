@@ -63,6 +63,7 @@
     <Compile Include="UnitsControl.xaml.cs">
       <DependentUpon>UnitsControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UnitsMVVM.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

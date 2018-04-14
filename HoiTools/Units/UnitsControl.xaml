@@ -3,53 +3,86 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:uic="clr-namespace:UIControls;assembly=UIControls"
              mc:Ignorable="d" d:DesignWidth="416.053" d:DesignHeight="280.144">
+    <UserControl.Resources>
+        <uic:VisibilityConverter x:Key="ConvertBool"/>
+        <uic:ValueConverterGroup x:Key="InvertVisibility">
+            <uic:BoolInverter/>
+            <uic:VisibilityConverter/>
+        </uic:ValueConverterGroup>
+    </UserControl.Resources>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="3*"/>
-        </Grid.ColumnDefinitions>
+        <ScrollViewer>
+            <StackPanel Orientation="Vertical" Visibility="{Binding ComparingMode, Converter={StaticResource ConvertBool}}">
+                <Grid>
+                    <Grid.Resources>
+                        <FrameworkElement  x:Key="CompProxyElement" DataContext="{Binding}"/>
+                    </Grid.Resources>
+                    <ContentControl Visibility="Collapsed" Content="{StaticResource CompProxyElement}"/>
+                    <DataGrid ItemsSource="{Binding Path=ComparisonTable, Mode=OneWay}" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding Spec}" Header="Specifications" Width="*" IsReadOnly="True"/>
+                            <DataGridTextColumn Binding="{Binding First}" Header="{Binding DataContext.FirstComparingModel, Source={StaticResource CompProxyElement}}" IsReadOnly="True"/>
+                            <DataGridTextColumn Binding="{Binding Second}" Header="{Binding DataContext.SecondComparingModel, Source={StaticResource CompProxyElement}}" IsReadOnly="True"/>
+                        </DataGrid.Columns>
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Highlight}" Value="True">
+                                        <Setter Property="Background" Value="LightCyan"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
+                    </DataGrid>
+                </Grid>
+                <Button Content="OK" Margin="5,5,5,5" Width="75" Click="Button_CloseCompare" HorizontalAlignment="Right"/>
+            </StackPanel>
+        </ScrollViewer>
+        <Grid Visibility="{Binding ComparingMode, Converter={StaticResource InvertVisibility}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="3*"/>
+            </Grid.ColumnDefinitions>
 
-        <ListBox x:Name="lbTypes" Grid.Column="0" ItemsSource="{Binding Path=Types, Mode=OneWay}" SelectedItem="{Binding Path=SelectedType, Mode=TwoWay}"/>
-        <ListBox x:Name="lbModels" Grid.Column="1" ItemsSource="{Binding Path=Models, Mode=OneWay}" SelectedItem="{Binding Path=SelectedModel, Mode=TwoWay}" HorizontalContentAlignment="Stretch">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{Binding Path=Name}" HorizontalAlignment="Left"/>
-                        <Button Grid.Column="1" Content="+" HorizontalAlignment="Right"
+            <ListBox x:Name="lbTypes" Grid.Column="0" ItemsSource="{Binding Path=Types, Mode=OneWay}" SelectedItem="{Binding Path=SelectedType, Mode=TwoWay}"/>
+            <ListBox x:Name="lbModels" Grid.Column="1" ItemsSource="{Binding Path=Models, Mode=OneWay}" SelectedItem="{Binding Path=SelectedModel, Mode=TwoWay}" HorizontalContentAlignment="Stretch">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <TextBlock Text="{Binding Path=Name}" HorizontalAlignment="Left"/>
+                            <Button Content="+" HorizontalAlignment="Right" Tag="{Binding}"  Click="Button_Click"
                                 MinWidth="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"
                                 MinHeight="{Binding ActualWidth, RelativeSource={RelativeSource Self}}">
-                            <Button.Style>
-                                <Style TargetType="{x:Type Button}">
-                                    <Setter Property="Visibility" Value="Hidden"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ListBoxItem}},Path=IsMouseOver}" Value="True">
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-                    </Grid>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-        <Grid Grid.Column="2">
-            <Grid.Resources>
-                <FrameworkElement  x:Key="ProxyElement" DataContext="{Binding}"/>
-            </Grid.Resources>
-            <ContentControl Visibility="Collapsed" Content="{StaticResource ProxyElement}"/>
-            <DataGrid x:Name="dataGrid" ItemsSource="{Binding Path=SelectedModel.Specifications, Mode=OneWay}" AutoGenerateColumns="False">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Binding="{Binding Key}" Header="Specifications" Width="*" IsReadOnly="True"/>
-                    <DataGridTextColumn Binding="{Binding Value}" Header="{Binding DataContext.SelectedModel, Source={StaticResource ProxyElement}}" IsReadOnly="True"/>
-                </DataGrid.Columns>
-            </DataGrid>
+                                <Button.Style>
+                                    <Style TargetType="{x:Type Button}">
+                                        <Setter Property="Visibility" Value="Hidden"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ListBoxItem}},Path=IsMouseOver}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <Grid Grid.Column="2">
+                <Grid.Resources>
+                    <FrameworkElement  x:Key="ProxyElement" DataContext="{Binding}"/>
+                </Grid.Resources>
+                <ContentControl Visibility="Collapsed" Content="{StaticResource ProxyElement}"/>
+                <DataGrid ItemsSource="{Binding Path=SelectedModel.Specifications, Mode=OneWay}" AutoGenerateColumns="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Binding="{Binding Key}" Header="Specifications" Width="*" IsReadOnly="True"/>
+                        <DataGridTextColumn Binding="{Binding Value}" Header="{Binding DataContext.SelectedModel, Source={StaticResource ProxyElement}}" IsReadOnly="True"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

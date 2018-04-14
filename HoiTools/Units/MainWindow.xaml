@@ -12,7 +12,24 @@
             <ComboBox x:Name="countryComboBox" HorizontalAlignment="Left" Margin="5,5,0,5" MinWidth="75"
                       ItemsSource="{Binding Countries}"
                       SelectedValue="{Binding CurrentCountry, Mode=TwoWay}"/>
-            <CheckBox Content="Compare" Margin="5,8,0,5" IsChecked="{Binding ElementName=unitsControl, Path=Mvvm.ModeCompare}" />
+            <Border BorderBrush="Black" BorderThickness="1" Margin="5,3,5,3">
+                <StackPanel Orientation="Horizontal">
+                    <ItemsControl ItemsSource="{Binding ElementName=unitsControl, Path=Mvvm.ComparingModels, Mode=OneWay}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel IsItemsHost="True" Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" Background="LightGoldenrodYellow" Margin="3,3,3,3"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <Button Content="Compare" Margin="5,3,5,3" VerticalAlignment="Top" Width="75"
+                            IsEnabled="{Binding ElementName=unitsControl, Path=Mvvm.CompareEnabled}" Click="Button_Click"/>
+                </StackPanel>
+            </Border>
             <Button x:Name="settingsBtn" Content="Settings" Margin="5,5,5,5" VerticalAlignment="Top" Width="75" Click="Settings_Click" HorizontalAlignment="Right"/>
         </DockPanel>
         <TextBox x:Name="textBox" DockPanel.Dock="Bottom" Height="69" Margin="5,5,5,5" TextWrapping="Wrap" Text="{Binding Log, Mode=OneWay}" VerticalAlignment="Bottom" IsReadOnly="True" TextChanged="textBox_TextChanged" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
