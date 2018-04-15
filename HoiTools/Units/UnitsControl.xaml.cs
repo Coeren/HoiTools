@@ -1,5 +1,6 @@
 ﻿using PersistentLayer;
 using System;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -19,7 +20,8 @@ namespace Units
             InitializeComponent();
 
             DataContext = _mvvm;
-            Loaded += (s, e) => { Window.GetWindow(this).Closed += Cleanup; };
+            if (!_IsDesigning) // Workaround to prevent XAML designer gets broken
+                Loaded += (s, e) => { Window.GetWindow(this).Closed += Cleanup; };
         }
 
         private void Cleanup(object sender, EventArgs e)
@@ -41,6 +43,16 @@ namespace Units
         private void Button_CloseCompare(object sender, RoutedEventArgs e)
         {
             _mvvm.CloseCompare();
+        }
+
+        private bool _IsDesigning
+        {
+            get
+            {
+                var prop = DesignerProperties.IsInDesignModeProperty;
+
+                return (bool) DependencyPropertyDescriptor.FromProperty(prop, typeof(FrameworkElement)).Metadata.DefaultValue;
+            }
         }
     }
 }

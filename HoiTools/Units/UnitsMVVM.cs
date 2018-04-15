@@ -34,15 +34,15 @@ namespace Units
             Core.DataChanged += Core_DataChanged;
         }
 
-        public IReadOnlyCollection<UnitTypes> Types { get { return Core.Models.Types; } }
+        public IReadOnlyCollection<UnitTypeName> Types { get => Core.UnitTypes.Types; }// new ObservableCollection<UnitTypeName>(Core.UnitTypes.Types); } }
 
-        public UnitTypes SelectedType
+        public UnitTypeName SelectedType
         {
             get { return _selectedType; }
             set { if (_selectedType != value) { _selectedType = value; OnPropertyChanged("Models"); } }
         }
 
-        public ObservableCollection<IModel> Models { get { return new ObservableCollection<IModel>(Core.Models.ModelType(_selectedType).Models); } }
+        public ObservableCollection<IModel> Models { get { return new ObservableCollection<IModel>(Core.UnitTypes.UnitType(_selectedType).Models); } }
 
         public IModel SelectedModel
         {
@@ -69,8 +69,10 @@ namespace Units
 
         private void Core_DataChanged(object sender, string e)
         {
-            if (e == "CurrentCountry")
+            if (e == "All")
             {
+                SelectedModel = null;
+                OnPropertyChanged("Types");
                 OnPropertyChanged("Models");
             }
         }
@@ -128,7 +130,7 @@ namespace Units
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private UnitTypes _selectedType;
+        private UnitTypeName _selectedType;
         private IModel _selectedModel;
         private ObservableCollection<IModel> _comparingModels = new ObservableCollection<IModel>();
         private bool _comparingMode = false;

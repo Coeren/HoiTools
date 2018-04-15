@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 
 namespace PersistentLayer
 {
-    public enum UnitTypes
+    public enum UnitTypeName
     {
         Infantry = 0,
         Cavalry,
@@ -46,15 +45,15 @@ namespace PersistentLayer
         ReadOnlyDictionary<string, double> Specifications { get; }
     }
 
-    public interface IModelType
+    public interface IUnitType
     {
         IReadOnlyCollection<IModel> Models { get; }
     }
 
-    public interface IModels
+    public interface IUnitTypes
     {
-        IReadOnlyCollection<UnitTypes> Types { get; }
-        IModelType ModelType(UnitTypes type);
+        IReadOnlyCollection<UnitTypeName> Types { get; }
+        IUnitType UnitType(UnitTypeName type);
     }
 
     internal class Model : IModel
@@ -104,68 +103,72 @@ namespace PersistentLayer
         private Dictionary<string, double> _specifications = new Dictionary<string, double>();
     }
 
-    internal class ModelType : IModelType
+    internal class UnitType : IUnitType
     {
-        public IReadOnlyCollection<IModel> Models { get { return _modelNames.Values; } }
+        public IReadOnlyCollection<IModel> Models { get { return _models.Values; } }
 
-        internal ModelType(int id, string name, string country = Constants.DefaultCountry) { SetModel(id, name, country); }
+        internal UnitType(int id, string name, string country = Constants.DefaultCountry) { SetModel(id, name, country); }
 
         internal void SetModel(int id, string name, string country = Constants.DefaultCountry)
         {
-            if (_modelNames.ContainsKey(id))
+            if (_models.ContainsKey(id))
             {
-                _modelNames[id].SetName(country, name);
+                _models[id].SetName(country, name);
             }
             else
             {
-                _modelNames.Add(id, new Model(country, name));
+                _models.Add(id, new Model(country, name));
             }
         }
         internal void SetSpec(int id, string key, double value)
         {
-            if (!_modelNames.ContainsKey(id))
+            if (!_models.ContainsKey(id))
             {
                 Trace.WriteLine("No model description for model id " + id);
-                _modelNames.Add(id, new Model(Constants.DefaultCountry, "Unknown"));
+                _models.Add(id, new Model(Constants.DefaultCountry, "Unknown"));
             }
 
-            _modelNames[id].SetSpec(key, value);
+            _models[id].SetSpec(key, value);
         }
 
-        private Dictionary<int, Model> _modelNames = new Dictionary<int, Model>();
+        private Dictionary<int, Model> _models = new Dictionary<int, Model>();
     }
 
-    internal class Models : IModels
+    internal class UnitTypes : IUnitTypes
     {
-        public IReadOnlyCollection<UnitTypes> Types { get { return _modelTypes.Keys; } }
+        public IReadOnlyCollection<UnitTypeName> Types { get { return _unitTypes.Keys; } }
 
-        public IModelType ModelType(UnitTypes type)
+        public IUnitType UnitType(UnitTypeName type)
         {
-            return _modelTypes[type];
+            UnitType ret;
+            if (!_unitTypes.TryGetValue(type, out ret))
+                ret = new UnitType(0, "Unknown");
+
+            return ret;
         }
 
-        internal void AddModel(UnitTypes type, int id, string name, string country = Constants.DefaultCountry)
+        internal void AddUnitType(UnitTypeName type, int id, string name, string country = Constants.DefaultCountry)
         {
-            if (_modelTypes.ContainsKey(type))
+            if (_unitTypes.ContainsKey(type))
             {
-                _modelTypes[type].SetModel(id, name, country);
+                _unitTypes[type].SetModel(id, name, country);
             }
             else
             {
-                _modelTypes.Add(type, new ModelType(id, name, country));
+                _unitTypes.Add(type, new UnitType(id, name, country));
             }
         }
-        internal void SetSpec(UnitTypes type, int id, string key, double value)
+        internal void SetSpec(UnitTypeName type, int id, string key, double value)
         {
-            if (!_modelTypes.ContainsKey(type))
+            if (!_unitTypes.ContainsKey(type))
             {
                 Trace.WriteLine("No type description for type " + type);
-                _modelTypes.Add(type, new ModelType(id, "Unknown", Constants.DefaultCountry));
+                _unitTypes.Add(type, new UnitType(id, "Unknown", Constants.DefaultCountry));
             }
 
-            _modelTypes[type].SetSpec(id, key, value);
+            _unitTypes[type].SetSpec(id, key, value);
         }
 
-        private Dictionary<UnitTypes, ModelType> _modelTypes = new Dictionary<UnitTypes, ModelType>();
+        private Dictionary<UnitTypeName, UnitType> _unitTypes = new Dictionary<UnitTypeName, UnitType>();
     }
 }
