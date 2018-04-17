@@ -4,11 +4,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Units"
-        xmlns:UIControls="clr-namespace:UIControls;assembly=UIControls" xmlns:PersistentLayer="clr-namespace:PersistentLayer;assembly=PersistentLayer" 
+        xmlns:UIControls="clr-namespace:UIControls;assembly=UIControls" 
         mc:Ignorable="d"
         Title="Settings" Height="128.809" Width="452.078" ResizeMode="NoResize">
     <DockPanel>
-        <PersistentLayer:CommonSettings x:Name="_commonSettings" DockPanel.Dock="Top" Margin="10,10,10,10" Width="Auto" Height="Auto"/>
+        <UIControls:CommonSettings x:Name="_commonSettings" DockPanel.Dock="Top" Margin="10,10,10,10" Width="Auto" Height="Auto"/>
         <Button x:Name="button" DockPanel.Dock="Top" Content="OK" HorizontalAlignment="Right" Margin="10,0,10,10" VerticalAlignment="Top" Width="75" IsDefault="True" Click="Ok_Click"/>
     </DockPanel>
 </Window>

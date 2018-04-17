@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PersistentLayer
+namespace Common
 {
     [Serializable]
     public class ConsistencyException : Exception

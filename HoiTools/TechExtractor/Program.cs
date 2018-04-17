@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CommandLine;
+using Common;
 using PersistentLayer;
 
 namespace TechExtractor
@@ -36,12 +37,12 @@ namespace TechExtractor
             {
                 if (!opts.Root.EndsWith(@"\")) opts.Root += @"\";
 
-                if (opts.Effects)
+                // Inversion?.. FFS, what an asshole designed this library...
+                if (!opts.Effects)
                 {
-                    foreach (string filename in Directory.GetFiles(opts.Root + Constants.TechPath))
-                        ExctractEffectsFromFile(filename);
+                    ExtractEffectsFromFile(opts.Root + Constants.TechPath);
                 }
-                else if (opts.Areas)
+                else if (!opts.Areas)
                 {
                     Console.WriteLine("Extracting areas from " + opts.Root);
                 }
@@ -60,8 +61,69 @@ namespace TechExtractor
             }
         }
 
-        private static void ExctractEffectsFromFile(string filename)
+        private enum EffectStates
         {
+            Effects,
+            Command,
+            Unknown
+        }
+
+        private static void ExtractEffectsFromFile(string path)
+        {
+            EffectStates state = EffectStates.Unknown;
+            string buff = null;
+            MultiMap<string, string> effects = new MultiMap<string, string>();
+            ClausewitzParser parser = new ClausewitzParser(
+                name =>
+                {
+                    if (name == "effects")
+                    {
+                        if (state != EffectStates.Unknown) throw new ClauzewitzSyntaxException("effects block inside " + state.ToString());
+                        state = EffectStates.Effects;
+                    }
+                    else if (name == "command")
+                    {
+                        if (state != EffectStates.Effects) throw new ClauzewitzSyntaxException("command block inside " + state.ToString());
+                        state = EffectStates.Command;
+                    }
+                },
+                () =>
+                {
+                    if (state == EffectStates.Command) state = EffectStates.Effects;
+                    else if (state == EffectStates.Effects) state = EffectStates.Unknown;
+                },
+                var =>
+                {
+                    if (state != EffectStates.Command) return;
+                    if (buff != null) throw new ClauzewitzSyntaxException("second variable name in a row (" + buff + ", " + var + ")");
+                    buff = var;
+                },
+                val =>
+                {
+                    if (state != EffectStates.Command) return;
+                    if (buff == null) throw new ClauzewitzSyntaxException("value without variable name (" + val + ")");
+                    effects.Add(buff, val);
+                    buff = null;
+                });
+
+            foreach (string filename in Directory.GetFiles(path))
+            {
+                if (filename.EndsWith(@"\old_nuclear_tech.txt"))
+                    continue;
+
+                parser.Parse(filename);
+
+                if (buff != null)
+                    throw new ClauzewitzSyntaxException("variable without a value (" + buff + ")");
+            }
+
+            Console.WriteLine("Found the following effects:");
+            foreach (string key in effects.Keys)
+            {
+                Console.WriteLine(key + ":");
+                foreach (string val in effects.ValueList(key))
+                    Console.WriteLine("\t" + val);
+            }
         }
     }
 }

@@ -56,10 +56,17 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="CommonSettings.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="PathSelector.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Compile Include="CommonSettings.xaml.cs">
+      <DependentUpon>CommonSettings.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ConvertBool.cs" />
     <Compile Include="PathSelector.xaml.cs">
       <DependentUpon>PathSelector.xaml</DependentUpon>
@@ -90,6 +97,12 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PersistentLayer\PersistentLayer.csproj">
+      <Project>{c5de0051-a6cf-4224-9590-3c63b066f3d2}</Project>
+      <Name>PersistentLayer</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

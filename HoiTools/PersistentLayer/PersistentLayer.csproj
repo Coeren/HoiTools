@@ -48,25 +48,15 @@
   <ItemGroup>
     <Compile Include="ClausewitzParser.cs" />
     <Compile Include="Technology.cs" />
-    <Compile Include="Utils.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Core.cs" />
-    <Compile Include="CommonSettings.xaml.cs">
-      <DependentUpon>CommonSettings.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UnitModels.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="CommonSettings.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\UIControls\UIControls.csproj">
-      <Project>{562cdf05-d662-4b71-ab99-eed2ac613c1e}</Project>
-      <Name>UIControls</Name>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{0229c8fc-4d05-4512-b766-268050aa99b2}</Project>
+      <Name>Common</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

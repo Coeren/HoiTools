@@ -2,6 +2,8 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 
+using Common;
+
 namespace PersistentLayer
 {
     public enum UnitTypeName

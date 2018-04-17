@@ -1,0 +1,9 @@
+﻿#asdasd
+
+block1 =
+{
+	name1 = val1
+	block2={val2 val} # asdfa
+	name3 = val3
+	block3 ={}
+}

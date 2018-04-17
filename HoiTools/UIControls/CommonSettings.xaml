@@ -3,13 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:PersistentLayer"
-             xmlns:UIControls="clr-namespace:UIControls;assembly=UIControls" x:Class="PersistentLayer.CommonSettings"
+             xmlns:local="clr-namespace:UIControls"
+             x:Class="UIControls.CommonSettings"
              mc:Ignorable="d" Height="41" Width="426.05">
     <Grid>
 
         <TextBlock x:Name="textBlock" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Hearts of Iron data paths:" VerticalAlignment="Top"/>
-        <UIControls:PathSelector x:Name="_rootPath" HorizontalAlignment="Stretch" Margin="0,21,0,0" VerticalAlignment="Top" SelectFolder="True" Prompt="Root HOI/mod folder:"/>
+        <local:PathSelector x:Name="_rootPath" HorizontalAlignment="Stretch" Margin="0,21,0,0" VerticalAlignment="Top" SelectFolder="True" Prompt="Root HOI/mod folder:"/>
 
     </Grid>
 </UserControl>
