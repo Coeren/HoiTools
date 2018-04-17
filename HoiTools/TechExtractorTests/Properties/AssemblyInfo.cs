@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("PersistentLayerTests")]
+[assembly: AssemblyTitle("TechExtractorTests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("PersistentLayerTests")]
+[assembly: AssemblyProduct("TechExtractorTests")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("2602cef3-ec56-4150-84db-47215b2b4d90")]
+[assembly: Guid("e4a5ecee-fd0e-4917-a443-692e3c8f2a2c")]
 
 // Version information for an assembly consists of the following four values:
 //

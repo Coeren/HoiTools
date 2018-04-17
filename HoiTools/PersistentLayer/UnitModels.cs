@@ -56,7 +56,7 @@ namespace PersistentLayer
         IUnitType UnitType(UnitTypeName type);
     }
 
-    internal class Model : IModel
+    internal class Model : IModel, IConsistencyChecker
     {
         public override string ToString() { return Name; }
 
@@ -99,11 +99,17 @@ namespace PersistentLayer
             _specifications[key] = value;
         }
 
+        public void CheckConsistency()
+        {
+            foreach (var nbc in _namesByCountry)
+                if (!Core.Countries.ContainsKey(nbc.Key)) throw new ConsistencyException(string.Format("Model for absent country found ({0})", nbc.Key));
+        }
+
         private Dictionary<string, string> _namesByCountry = new Dictionary<string, string>();
         private Dictionary<string, double> _specifications = new Dictionary<string, double>();
     }
 
-    internal class UnitType : IUnitType
+    internal class UnitType : IUnitType, IConsistencyChecker
     {
         public IReadOnlyCollection<IModel> Models { get { return _models.Values; } }
 
@@ -131,10 +137,16 @@ namespace PersistentLayer
             _models[id].SetSpec(key, value);
         }
 
+        public void CheckConsistency()
+        {
+            foreach (var item in _models)
+                item.Value.CheckConsistency();
+        }
+
         private Dictionary<int, Model> _models = new Dictionary<int, Model>();
     }
 
-    internal class UnitTypes : IUnitTypes
+    internal class UnitTypes : IUnitTypes, IConsistencyChecker
     {
         public IReadOnlyCollection<UnitTypeName> Types { get { return _unitTypes.Keys; } }
 
@@ -167,6 +179,12 @@ namespace PersistentLayer
             }
 
             _unitTypes[type].SetSpec(id, key, value);
+        }
+
+        public void CheckConsistency()
+        {
+            foreach (var item in _unitTypes)
+                item.Value.CheckConsistency();
         }
 
         private Dictionary<UnitTypeName, UnitType> _unitTypes = new Dictionary<UnitTypeName, UnitType>();

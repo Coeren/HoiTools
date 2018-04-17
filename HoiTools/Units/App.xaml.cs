@@ -12,7 +12,7 @@ namespace Units
     {
         private readonly StringTextListener _listener = new StringTextListener();
 
-        static public StringTextListener Log { get { return (Current as App)._listener; } }
+        public static StringTextListener Log { get { return (Current as App)._listener; } }
 
         private App()
         {

@@ -2,13 +2,14 @@
 
 namespace PersistentLayer
 {
-    static internal class Constants
+    public static class Constants
     {
-        internal const string DefaultCountry = "MODEL";
+        public const string DefaultCountry = "MODEL";
 
-        internal const string TextPath = @"\config\text.csv";
-        internal const string ModelsPath = @"\config\models.csv";
-        internal const string CountriesPath = @"\db\country.csv";
-        internal const string ModelSpecsPath = @"\db\units\";
+        public const string TextPath = @"\config\text.csv";
+        public const string ModelsPath = @"\config\models.csv";
+        public const string CountriesPath = @"\db\country.csv";
+        public const string ModelSpecsPath = @"\db\units\";
+        public const string TechPath = @"\db\tech\";
     }
 }

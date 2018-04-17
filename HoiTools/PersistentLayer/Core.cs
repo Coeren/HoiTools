@@ -13,7 +13,7 @@ namespace PersistentLayer
         private static readonly Lazy<Core> _lazy = new Lazy<Core>(() => new Core());
         private static Core Instance { get { return _lazy.Value; } }
 
-        static public string RootFolder
+        public static string RootFolder
         {
             get { return ConfigurationManager.AppSettings["RootFolder"]; }
             set
@@ -34,10 +34,10 @@ namespace PersistentLayer
                 Instance.Init(value);
             }
         }
-        static public IUnitTypes UnitTypes { get { return Instance._unitTypes; } }
-        static public IReadOnlyCollection<string> Countries { get { return Instance._countries.Values; } }
-        static internal string CurrentCountryTag { get { return Instance._countryTag; } }
-        static public string CurrentCountry
+        public static IUnitTypes UnitTypes { get => Instance._unitTypes; }
+        public static IReadOnlyDictionary<string, string> Countries { get => Instance._countries; }
+        internal static string CurrentCountryTag { get => Instance._countryTag; }
+        public static string CurrentCountry
         {
             get { return Instance._countries[Instance._countryTag]; }
             set
@@ -46,7 +46,7 @@ namespace PersistentLayer
                 DataChanged?.Invoke(null, "CurrentCountry");
             }
         }
-        static public void Prepare()
+        public static void Prepare()
         {
             string root = RootFolder;
             if (!string.IsNullOrEmpty(root))
@@ -288,6 +288,9 @@ namespace PersistentLayer
         {
             try
             {
+                _countries[Constants.DefaultCountry] = "Common";
+                _countryTags["Common"] = Constants.DefaultCountry;
+
                 using (StreamReader sr = new StreamReader(root + Constants.CountriesPath))
                 {
                     string s = sr.ReadLine(); // skip header
@@ -322,14 +325,13 @@ namespace PersistentLayer
                         }
                     }
                 }
-
-                _countries[Constants.DefaultCountry] = "Common";
-                _countryTags["Common"] = Constants.DefaultCountry;
             }
             catch (Exception e)
             {
                 throw new IOException("Error accessing text data", e);
             }
+
+            _unitTypes.CheckConsistency();
         }
 
         private Dictionary<string, string> _textData = new Dictionary<string, string>();
@@ -338,6 +340,6 @@ namespace PersistentLayer
         private Dictionary<string, string> _countryTags = new Dictionary<string, string>();
         private string _countryTag = Constants.DefaultCountry;
 
-        static public event EventHandler<string> DataChanged;
+        public static event EventHandler<string> DataChanged;
     }
 }

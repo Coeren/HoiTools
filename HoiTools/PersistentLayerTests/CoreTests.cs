@@ -1,12 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-using PersistentLayer;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
-namespace PersistentLayerTests
+namespace PersistentLayer.Tests
 {
     public class TraceCounter : TraceListener
     {
@@ -30,6 +28,12 @@ namespace PersistentLayerTests
     [TestClass]
     public class CoreTests
     {
+        [TestMethod]
+        public void PrepareTest()
+        {
+            Assert.Inconclusive();
+        }
+
         [TestMethod]
 //        [ExpectedException(typeof(System.InvalidOperationException))]
         public void CreationNotConfigured()
@@ -59,7 +63,7 @@ namespace PersistentLayerTests
             Trace.Listeners.Add(tc);
             prCore.Invoke("ParseTextData", root);
 
-            int textCount = ((Dictionary<string, string>) prCore.GetField("_textData")).Count;
+            int textCount = ((Dictionary<string, string>)prCore.GetField("_textData")).Count;
             Assert.AreEqual(lines, textCount + tc.Lines, "Text count ({0}) is wrong (should be {1} - {2} = {3})", textCount, lines, tc.Lines, lines - tc.Lines);
             Assert.AreEqual(tc.Lines, 0);
         }
@@ -78,48 +82,17 @@ namespace PersistentLayerTests
 
             int modelsCount = 0;
             PrivateObject types = new PrivateObject(prCore.GetField("_unitTypes"));
-            foreach (var e1 in (Dictionary<UnitTypeName, UnitType>) types.GetField("_unitTypes"))
-            {
-                PrivateObject models = new PrivateObject(e1.Value);
-                foreach (var e2 in (Dictionary<int, Model>) models.GetField("_models"))
-                {
-                    PrivateObject model = new PrivateObject(e2.Value);
-                    modelsCount += ((Dictionary<string, string>) model.GetField("_namesByCountry")).Count;
-                }
-            }
-
-            Assert.AreEqual(lines - 1, modelsCount + tc.Lines, "Model count ({0}) is wrong (should be {1} - {2} = {3})", modelsCount, lines - 2, tc.Lines, lines - 2 - tc.Lines);
-        }
-
-        [TestMethod]
-        public void CountriesParsed()
-        {
-            int lines = File.ReadLines(@"D:\Games\HOI\mod-CORE\config\models.csv").Count();
-            TraceCounter tc = new TraceCounter();
-
-            string root = @"D:\Games\HOI\mod-CORE";
-            PrivateObject prCore = new PrivateObject(typeof(Core));
-            prCore.Invoke("ParseTextData", root);
-
-            Trace.Listeners.Add(tc);
-            prCore.Invoke("ParseCountries", root);
-
-            var countries = (Dictionary<string, string>) prCore.GetField("_countries");
-            int countryTags = ((Dictionary<string, string>)prCore.GetField("_countryTags")).Count;
-            Assert.AreEqual(countries.Count, countryTags, "Country count ({0}) isn't equal to tags count ({1})", countries.Count, countryTags);
-
-            prCore.Invoke("ParseModelNames", root);
-            PrivateObject types = new PrivateObject(prCore.GetField("_unitTypes"));
             foreach (var e1 in (Dictionary<UnitTypeName, UnitType>)types.GetField("_unitTypes"))
             {
                 PrivateObject models = new PrivateObject(e1.Value);
                 foreach (var e2 in (Dictionary<int, Model>)models.GetField("_models"))
                 {
                     PrivateObject model = new PrivateObject(e2.Value);
-                    foreach (string countryTag in ((Dictionary<string, string>)model.GetField("_namesByCountry")).Keys)
-                        if (!countries.ContainsKey(countryTag)) Assert.Fail("Model for absent country found ({0})", countryTag);
+                    modelsCount += ((Dictionary<string, string>)model.GetField("_namesByCountry")).Count;
                 }
             }
+
+            Assert.AreEqual(lines - 1, modelsCount + tc.Lines, "Model count ({0}) is wrong (should be {1} - {2} = {3})", modelsCount, lines - 2, tc.Lines, lines - 2 - tc.Lines);
         }
     }
 }

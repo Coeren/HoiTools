@@ -18,7 +18,7 @@ namespace Units
             public event PropertyChangedEventHandler PropertyChanged;
 
             public string Log { get { return App.Log.Trace; } }
-            public IReadOnlyCollection<string> Countries { get { return Core.Countries; } }
+            public IEnumerable<string> Countries { get { return Core.Countries.Values; } }
             public string CurrentCountry
             {
                 get { return Core.CurrentCountry; }

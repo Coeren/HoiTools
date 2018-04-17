@@ -75,6 +75,10 @@ namespace Units
                 OnPropertyChanged("Types");
                 OnPropertyChanged("Models");
             }
+            else if (e == "CurrentCountry")
+            {
+                OnPropertyChanged("Models");
+            }
         }
 
         public ObservableCollection<IModel> ComparingModels { get => _comparingModels; }
