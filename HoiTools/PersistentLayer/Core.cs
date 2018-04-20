@@ -10,8 +10,7 @@ namespace PersistentLayer
 {
     public sealed class Core
     {
-        private static readonly Lazy<Core> _lazy = new Lazy<Core>(() => new Core());
-        private static Core Instance { get { return _lazy.Value; } }
+        public static event EventHandler<string> DataChanged;
 
         public static string RootFolder
         {
@@ -81,6 +80,7 @@ namespace PersistentLayer
             _countries = new Dictionary<string, string>();
             var countryTags = _countryTags;
             _countryTags = new Dictionary<string, string>();
+            Dictionary<TechAreas, TechArea> techAreas;
 
             try
             {
@@ -88,6 +88,8 @@ namespace PersistentLayer
                 ParseModelNames(root);
                 ParseCountries(root);
                 ParseModelSpecifications(root);
+
+                techAreas = (new TechParser(root)).Parse();
             }
             catch (Exception)
             {
@@ -98,6 +100,8 @@ namespace PersistentLayer
 
                 throw;
             }
+
+            _techAreas = techAreas;
 
             _countryTag = Constants.DefaultCountry;
             DataChanged?.Invoke(null, "All");
@@ -334,12 +338,14 @@ namespace PersistentLayer
             _unitTypes.CheckConsistency();
         }
 
+        private static readonly Lazy<Core> _lazy = new Lazy<Core>(() => new Core());
+        private static Core Instance { get { return _lazy.Value; } }
+
+        private string _countryTag = Constants.DefaultCountry;
         private Dictionary<string, string> _textData = new Dictionary<string, string>();
         private UnitTypes _unitTypes = new UnitTypes();
         private Dictionary<string, string> _countries = new Dictionary<string, string>();
         private Dictionary<string, string> _countryTags = new Dictionary<string, string>();
-        private string _countryTag = Constants.DefaultCountry;
-
-        public static event EventHandler<string> DataChanged;
+        private Dictionary<TechAreas, TechArea> _techAreas = new Dictionary<TechAreas, TechArea>();
     }
 }

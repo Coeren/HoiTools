@@ -15,11 +15,17 @@ namespace TechExtractor
         [Option('d', "root", Required = true, HelpText = "Root folder for hoi/mod.")]
         public string Root { get; set; }
 
-        [Option('a', "areas", SetName = "Areas", HelpText = "Extract tech effects.")]
+        [Option('e', "effects", SetName = "Tree, Block, Variable", HelpText = "Extract tech areas.")]
         public bool Effects { get; set; }
 
-        [Option('e', "effects", SetName = "Effects", HelpText = "Extract tech areas.")]
-        public bool Areas { get; set; }
+        [Option('t', "tree", SetName = "Effects, Block, Variable", HelpText = "Extract tech areas.")]
+        public bool Tree { get; set; }
+
+        [Option('b', HelpText = "Extract possible block content.")]
+        public string Block { get; set; }
+
+        [Option('v', HelpText = "Extract possible variable values (only with -b).")]
+        public string Variable { get; set; }
     }
 
     class Program
@@ -37,14 +43,25 @@ namespace TechExtractor
             {
                 if (!opts.Root.EndsWith(@"\")) opts.Root += @"\";
 
-                // Inversion?.. FFS, what an asshole designed this library...
-                if (!opts.Effects)
+                if (opts.Tree)
                 {
-                    ExtractEffectsFromFile(opts.Root + Constants.TechPath);
+                    ExctractTechTree(opts.Root + Constants.TechPath);
+                    PrintOutTree("", 0);
                 }
-                else if (!opts.Areas)
+                else if (!string.IsNullOrEmpty(opts.Block))
                 {
-                    Console.WriteLine("Extracting areas from " + opts.Root);
+                    ExctractTechTree(opts.Root + Constants.TechPath);
+
+                    if (!string.IsNullOrEmpty(opts.Variable))
+                        foreach (string item in _blocks[opts.Block].Vars.ValueList(opts.Variable).OrderBy(s => s))
+                            Console.WriteLine(item);
+                    else
+                        foreach (string item in _blocks[opts.Block].Vars.Keys.OrderBy(s => s))
+                            Console.WriteLine(item);
+                }
+                else if (opts.Effects)
+                {
+                    ExtractEffects(opts.Root + Constants.TechPath);
                 }
                 else
                 {
@@ -61,6 +78,66 @@ namespace TechExtractor
             }
         }
 
+        private class Block
+        {
+            internal Block()
+            {
+                Siblings = new HashSet<string>();
+                Vars = new MultiMap<string, string>();
+            }
+
+            internal HashSet<string> Siblings { get; }
+            internal MultiMap<string, string> Vars { get; }
+        }
+
+        private static void ExctractTechTree(string path)
+        {
+            _blocks.Clear();
+            _blocks.Add("", new Block());
+            Stack<Block> stack = new Stack<Block>();
+            stack.Push(_blocks[""]);
+            ClausewitzParser parser = new ClausewitzParser(
+                name =>
+                {
+                    stack.Peek().Siblings.Add(name);
+                    if (!_blocks.ContainsKey(name))
+                        _blocks.Add(name, new Block());
+
+                    stack.Push(_blocks[name]);
+                },
+                () =>
+                {
+                    stack.Pop();
+                },
+                (name, val) =>
+                {
+                    stack.Peek().Vars[name] = val;
+                },
+                val =>
+                {
+                });
+
+            foreach (string filename in Directory.GetFiles(path))
+            {
+                if (filename.EndsWith(@"\old_nuclear_tech.txt"))
+                    continue;
+
+                parser.Parse(filename);
+            }
+        }
+
+        private static void PrintOutTree(string blockName, int level)
+        {
+            Console.WriteLine(new string('\t', level) + "+ " + blockName);
+            Block block = _blocks[blockName];
+
+            foreach (string attr in block.Vars.Keys)
+                Console.WriteLine(new string('\t', level + 1) + "  " + attr);
+
+            foreach (string sib in block.Siblings)
+                PrintOutTree(sib, level + 1);
+        }
+
         private enum EffectStates
         {
             Effects,
@@ -68,10 +145,9 @@ namespace TechExtractor
             Unknown
         }
 
-        private static void ExtractEffectsFromFile(string path)
+        private static void ExtractEffects(string path)
         {
             EffectStates state = EffectStates.Unknown;
-            string buff = null;
             MultiMap<string, string> effects = new MultiMap<string, string>();
             ClausewitzParser parser = new ClausewitzParser(
                 name =>
@@ -92,18 +168,14 @@ namespace TechExtractor
                     if (state == EffectStates.Command) state = EffectStates.Effects;
                     else if (state == EffectStates.Effects) state = EffectStates.Unknown;
                 },
-                var =>
+                (name, val) =>
                 {
                     if (state != EffectStates.Command) return;
-                    if (buff != null) throw new ClauzewitzSyntaxException("second variable name in a row (" + buff + ", " + var + ")");
-                    buff = var;
+
+                    effects.Add(name, val);
                 },
                 val =>
                 {
-                    if (state != EffectStates.Command) return;
-                    if (buff == null) throw new ClauzewitzSyntaxException("value without variable name (" + val + ")");
-                    effects.Add(buff, val);
-                    buff = null;
                 });
 
             foreach (string filename in Directory.GetFiles(path))
@@ -112,9 +184,6 @@ namespace TechExtractor
                     continue;
 
                 parser.Parse(filename);
-
-                if (buff != null)
-                    throw new ClauzewitzSyntaxException("variable without a value (" + buff + ")");
             }
 
             Console.WriteLine("Found the following effects:");
@@ -125,5 +194,7 @@ namespace TechExtractor
                     Console.WriteLine("\t" + val);
             }
         }
+
+        private static Dictionary<string, Block> _blocks = new Dictionary<string, Block>();
     }
 }

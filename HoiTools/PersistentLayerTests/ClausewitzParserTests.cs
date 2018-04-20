@@ -19,9 +19,7 @@ namespace PersistentLayer.Tests
             const string expected3 = "block1begin\n" +
                                     "name1 =val1\n" +
                                     "block2begin\n" +
-                                    "=val2\n" +
-                                    "=val\n" +
-                                    "BLOCKend\n" +
+                                    " val2 " + " val " + "BLOCKend\n" +
                                     "name3 =val3\n" +
                                     "block3begin\n" +
                                     "BLOCKend\n" +
@@ -29,7 +27,7 @@ namespace PersistentLayer.Tests
 
             string res = "";
             ClausewitzParser parser =
-                new ClausewitzParser(block => { res += block + "begin\n"; }, () => { res += "BLOCKend\n"; }, name => { res += name + " "; }, val => { res += "=" + val + "\n"; });
+                new ClausewitzParser(block => { res += block + "begin\n"; }, () => { res += "BLOCKend\n"; }, (name, val) => { res += name + " =" + val + "\n"; }, val => { res += " " + val + " "; });
             parser.Parse("TestData\\ClausewitzTest1.txt");
             Assert.AreEqual(expected, res);
 

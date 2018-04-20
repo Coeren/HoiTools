@@ -12,8 +12,9 @@ namespace PersistentLayer
     {
         public delegate void Handler();
         public delegate void StringHandler(string name);
+        public delegate void String2Handler(string name, string val);
 
-        public ClausewitzParser(StringHandler beginBlock, Handler endBlock, StringHandler variable, StringHandler value)
+        public ClausewitzParser(StringHandler beginBlock, Handler endBlock, String2Handler variable, StringHandler value)
         {
             _beginBlockHandler = beginBlock;
             _endBlockHandler = endBlock;
@@ -96,9 +97,9 @@ namespace PersistentLayer
                                     if (_buff == _pattern)
                                         throw new ClauzewitzSyntaxException("Unexpected '" + a[i] + "'");
 
-                                    _variable(_buff);
+                                    _variable(_buff, a[i]);
                                     _buff = _pattern;
-                                    _value(a[i]);
+//                                    _value(a[i]);
                                     _state = States.Val;
                                 }
                                 break;
@@ -193,7 +194,7 @@ namespace PersistentLayer
 
         private StringHandler _beginBlockHandler;
         private Handler _endBlockHandler;
-        private StringHandler _variable;
+        private String2Handler _variable;
         private StringHandler _value;
 
         private const string _pattern = "Parse logic error";
