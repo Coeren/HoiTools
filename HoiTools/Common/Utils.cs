@@ -16,6 +16,7 @@ namespace Common
     public interface IConsistencyChecker
     {
         void CheckConsistency(); // throw ConsistencyException
+        void CheckConsistency<T>(T param); // throw ConsistencyException
     }
 
     public static class Extenstions

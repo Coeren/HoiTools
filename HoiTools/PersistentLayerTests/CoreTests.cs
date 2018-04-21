@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -31,7 +32,15 @@ namespace PersistentLayer.Tests
         [TestMethod]
         public void PrepareTest()
         {
-            Assert.Inconclusive();
+            Core.RootFolder = @"D:\Games\HOI\mod-CORE";
+            bool signaled = false;
+            EventHandler<string> handler = (o, s) => { if (s == "All") signaled = true; };
+
+            Core.DataChanged += handler;
+            Assert.IsFalse(signaled);
+            Core.Prepare();
+            Assert.IsTrue(signaled);
+            Core.DataChanged -= handler;
         }
 
         [TestMethod]

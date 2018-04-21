@@ -14,9 +14,9 @@ namespace PersistentLayer
             _root = root;
         }
 
-        internal Dictionary<TechAreas, TechArea> Parse()
+        internal Dictionary<TechAreas, ITechArea> Parse()
         {
-            _areas = new Dictionary<TechAreas, TechArea>();
+            _areas = new Dictionary<TechAreas, ITechArea>();
             _reqs = new MultiMap<int, int>();
             _mapping = new Dictionary<int, Technology>();
             _state = States.file;
@@ -38,7 +38,7 @@ namespace PersistentLayer
                 }
 
             foreach (var item in _areas)
-                item.Value.CheckConsistency();
+                ((TechArea) item.Value).CheckConsistency(_areas);
 
             return _areas;
         }
@@ -267,7 +267,7 @@ namespace PersistentLayer
 
         private string _root;
         private CultureInfo _culture = CultureInfo.CreateSpecificCulture("en-US");
-        private Dictionary<TechAreas, TechArea> _areas;
+        private Dictionary<TechAreas, ITechArea> _areas;
         private MultiMap<int, int> _reqs;
         private Dictionary<int, Technology> _mapping;
         private States _state = States.file;

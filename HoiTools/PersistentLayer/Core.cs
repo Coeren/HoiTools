@@ -44,6 +44,7 @@ namespace PersistentLayer
                 DataChanged?.Invoke(null, "CurrentCountry");
             }
         }
+        public static IReadOnlyDictionary<TechAreas, ITechArea> Tech { get => Instance._techAreas; }
         public static void Prepare()
         {
             string root = RootFolder;
@@ -82,7 +83,7 @@ namespace PersistentLayer
             _countries = new Dictionary<string, string>();
             var countryTags = _countryTags;
             _countryTags = new Dictionary<string, string>();
-            Dictionary<TechAreas, TechArea> techAreas;
+            Dictionary<TechAreas, ITechArea> techAreas;
 
             try
             {
@@ -348,6 +349,6 @@ namespace PersistentLayer
         private UnitTypes _unitTypes = new UnitTypes();
         private Dictionary<string, string> _countries = new Dictionary<string, string>();
         private Dictionary<string, string> _countryTags = new Dictionary<string, string>();
-        private Dictionary<TechAreas, TechArea> _techAreas = new Dictionary<TechAreas, TechArea>();
+        private Dictionary<TechAreas, ITechArea> _techAreas = new Dictionary<TechAreas, ITechArea>();
     }
 }

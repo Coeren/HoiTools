@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Linq;
 using System.Collections.Generic;
 
 using Common;
@@ -185,13 +185,21 @@ namespace PersistentLayer
 
         public void CheckConsistency()
         {
-            if (Id <= 0 || !Area.IsValid() || string.IsNullOrEmpty(Name) || string.IsNullOrEmpty(Desc) || _root == null)
-                throw new ConsistencyException("TechArea is not configured");
-
+            ChkCon();
             _root.CheckConsistency();
+        }
+        public void CheckConsistency<T>(T param)
+        {
+            ChkCon();
+            _root.CheckConsistency(param);
         }
 
         internal void SetRoot(TheoryTech root) { _root = root; }
+        private void ChkCon()
+        {
+            if (Id <= 0 || !Area.IsValid() || string.IsNullOrEmpty(Name) || string.IsNullOrEmpty(Desc) || _root == null)
+                throw new ConsistencyException("TechArea is not configured");
+        }
 
         private TheoryTech _root;
     }
@@ -206,6 +214,10 @@ namespace PersistentLayer
         {
             if (!Applies.IsValid() || !Type.IsValid())
                 throw new ConsistencyException("Invalid effect");
+        }
+        public void CheckConsistency<T>(T param)
+        {
+            CheckConsistency();
         }
 
         internal TechEffect() {}
@@ -231,10 +243,51 @@ namespace PersistentLayer
         public void CheckConsistency()
         {
             if (Id <= 0 || !Area.IsValid() || string.IsNullOrEmpty(Name) || string.IsNullOrEmpty(Desc) || Cost <= 0 || Duration <= 0)
-                throw new ConsistencyException("Invalid tech");
+                throw new ConsistencyException("Invalid tech '" + Name + "'");
+
+            if (_predecessors.Count > 0)
+            {
+                bool found = false;
+                foreach (var item in _predecessors)
+                    if (item._successors.Contains(this))
+                    {
+                        found = true;
+                        break;
+                    }
+                if (!found)
+                    throw new ConsistencyException("Pred/succ inconsistency in tech '" + Name + "'");
+            }
+            else if (this.GetType() != typeof(TheoryTech))
+                throw new ConsistencyException("Pred/succ inconsistency in tech '" + Name + "'");
+
 
             foreach (var item in _successors)
                 item.CheckConsistency();
+        }
+        public void CheckConsistency<T>(T param)
+        {
+            Dictionary<TechAreas, ITechArea> areas = param as Dictionary<TechAreas, ITechArea>;
+
+            if (Id <= 0 || !Area.IsValid() || string.IsNullOrEmpty(Name) || string.IsNullOrEmpty(Desc) || Cost <= 0 || Duration <= 0)
+                throw new ConsistencyException("Invalid tech '" + Name + "'");
+
+            if (_predecessors.Count > 0)
+            {
+                bool found = false;
+                foreach (var item in _predecessors)
+                    if (item._successors.Contains(this))
+                    {
+                        found = true;
+                        break;
+                    }
+                if (!found)
+                    throw new ConsistencyException("Pred/succ inconsistency in tech '" + Name + "'");
+            }
+            else if (this.GetType() != typeof(TheoryTech) || areas != null && !areas.Values.Any(a => a.Root == this))
+                throw new ConsistencyException("Pred/succ inconsistency in tech '" + Name + "'");
+
+            foreach (var item in _successors)
+                item.CheckConsistency(param);
         }
 
         internal Technology() {}
@@ -262,9 +315,16 @@ namespace PersistentLayer
         public new void CheckConsistency()
         {
             if (_children.Count == 0)
-                throw new ConsistencyException("No siblings in theory tech");
+                throw new ConsistencyException("No siblings in theory tech '" + Name + "'");
 
             base.CheckConsistency();
+        }
+        public new void CheckConsistency<T>(T param)
+        {
+            if (_children.Count == 0)
+                throw new ConsistencyException("No siblings in theory tech '" + Name + "'");
+
+            base.CheckConsistency(param);
         }
 
         internal TheoryTech() {}
@@ -282,11 +342,21 @@ namespace PersistentLayer
 
         public new void CheckConsistency()
         {
-            if (_effects.Count == 0) throw new ConsistencyException("No effects in applied tech");
+            if (_effects.Count == 0) throw new ConsistencyException("No effects in applied tech '" + Name + "'");
+            if (Parent == null) throw new ConsistencyException("No parent in applied tech '" + Name + "'");
             foreach (var item in _effects)
                 item.CheckConsistency();
 
             base.CheckConsistency();
+        }
+        public new void CheckConsistency<T>(T param)
+        {
+            if (_effects.Count == 0) throw new ConsistencyException("No effects in applied tech '" + Name + "'");
+            if (Parent == null) throw new ConsistencyException("No parent in applied tech '" + Name + "'");
+            foreach (var item in _effects)
+                item.CheckConsistency(param);
+
+            base.CheckConsistency(param);
         }
 
         internal AppliedTech() {}
