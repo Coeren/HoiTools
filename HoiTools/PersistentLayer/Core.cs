@@ -35,7 +35,6 @@ namespace PersistentLayer
         }
         public static IUnitTypes UnitTypes { get => Instance._unitTypes; }
         public static IReadOnlyDictionary<string, string> Countries { get => Instance._countries; }
-        internal static string CurrentCountryTag { get => Instance._countryTag; }
         public static string CurrentCountry
         {
             get { return Instance._countries[Instance._countryTag]; }
@@ -51,7 +50,10 @@ namespace PersistentLayer
             if (!string.IsNullOrEmpty(root))
                 Instance.Init(root);
         }
-        
+
+        internal static string CurrentCountryTag { get => Instance._countryTag; }
+        internal static Dictionary<string, string> Text { get => Instance._textData; }
+
         private Core()
         {
             _countries[Constants.DefaultCountry] = "Common";

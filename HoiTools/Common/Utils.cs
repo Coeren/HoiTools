@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Common
 {
@@ -15,5 +16,19 @@ namespace Common
     public interface IConsistencyChecker
     {
         void CheckConsistency(); // throw ConsistencyException
+    }
+
+    public static class Extenstions
+    {
+        public static TValue GetValue<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue def = default(TValue))
+        {
+            return dictionary.ContainsKey(key) ? dictionary[key] : def;
+        }
+
+        // Does not work with [flags]
+        public static bool IsValid<T>(this T en)
+        {
+            return en != null && Enum.IsDefined(typeof(T), en);
+        }
     }
 }

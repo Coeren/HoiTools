@@ -94,9 +94,51 @@ namespace PersistentLayer
         visibility
     }
 
+    public enum TechEffectsTargets
+    {
+        air,
+        anti_air,
+        anti_tank,
+        application,
+        armor,
+        artillery,
+        battleship,
+        bergsjaeger,
+        carrier,
+        cavalry,
+        coal_to_oil,
+        cruiser,
+        destroyer,
+        dive_bomber,
+        engineer,
+        fighter,
+        flying_bomb,
+        flying_rocket,
+        infantry,
+        land,
+        marine,
+        mechanized,
+        militia,
+        motorized,
+        naval_bomber,
+        oil_to_rubber,
+        paratrooper,
+        strategic_bomber,
+        submarine,
+        supplies,
+        tactical_bomber,
+        them,
+        theoretical,
+        torpedo_plane,
+        total,
+        transport_plane,
+        transports,
+        us
+    }
+
     public interface ITechEffect
     {
-        int Applies { get; }
+        TechEffectsTargets Applies { get; }
         TechEffects Type { get; }
         double Value { get; }
     }
@@ -143,8 +185,10 @@ namespace PersistentLayer
 
         public void CheckConsistency()
         {
-            if (Id <= 0 || !Enum.IsDefined(typeof(TechAreas), Area) || string.IsNullOrEmpty(Name) || string.IsNullOrEmpty(Desc) || _root == null)
+            if (Id <= 0 || !Area.IsValid() || string.IsNullOrEmpty(Name) || string.IsNullOrEmpty(Desc) || _root == null)
                 throw new ConsistencyException("TechArea is not configured");
+
+            _root.CheckConsistency();
         }
 
         internal void SetRoot(TheoryTech root) { _root = root; }
@@ -152,13 +196,20 @@ namespace PersistentLayer
         private TheoryTech _root;
     }
 
-    internal class TechEffect : ITechEffect
+    internal class TechEffect : ITechEffect, IConsistencyChecker
     {
-        public int Applies { get; }
-        public TechEffects Type { get; }
-        public double Value { get; }
+        public TechEffectsTargets Applies { get; internal set; }
+        public TechEffects Type { get; internal set; }
+        public double Value { get; internal set; }
 
-        internal TechEffect(int applies, TechEffects type, double value)
+        public void CheckConsistency()
+        {
+            if (!Applies.IsValid() || !Type.IsValid())
+                throw new ConsistencyException("Invalid effect");
+        }
+
+        internal TechEffect() {}
+        internal TechEffect(TechEffectsTargets applies, TechEffects type, double value)
         {
             Applies = applies;
             Type = type;
@@ -168,20 +219,25 @@ namespace PersistentLayer
 
     internal class Technology : ITechnology, IConsistencyChecker
     {
-        public int Id { get; }
-        public TechAreas Area { get; }
-        public string Name { get; }
-        public string Desc { get; }
-        public int Cost { get; }
-        public int Duration { get; }
-        public List<ITechnology> Predecessors { get; }
-        public List<ITechnology> Successors { get; }
+        public int Id { get; internal set; }
+        public TechAreas Area { get; internal set; }
+        public string Name { get; internal set; }
+        public string Desc { get; internal set; }
+        public int Cost { get; internal set; }
+        public int Duration { get; internal set; }
+        public IReadOnlyCollection<ITechnology> Predecessors { get => _predecessors; }
+        public IReadOnlyCollection<ITechnology> Successors { get => _successors; }
 
         public void CheckConsistency()
         {
-            throw new NotImplementedException();
+            if (Id <= 0 || !Area.IsValid() || string.IsNullOrEmpty(Name) || string.IsNullOrEmpty(Desc) || Cost <= 0 || Duration <= 0)
+                throw new ConsistencyException("Invalid tech");
+
+            foreach (var item in _successors)
+                item.CheckConsistency();
         }
 
+        internal Technology() {}
         internal Technology(int id, TechAreas area, string name, string desc, int cost, int duration)
         {
             Id = id;
@@ -190,30 +246,57 @@ namespace PersistentLayer
             Desc = desc;
             Cost = cost;
             Duration = duration;
-            Predecessors = new List<ITechnology>();
-            Successors = new List<ITechnology>();
+        }
+
+        internal List<Technology> Preds => _predecessors;
+        internal List<Technology> Succs => _successors;
+
+        List<Technology> _predecessors = new List<Technology>();
+        List<Technology> _successors = new List<Technology>();
     }
-}
 
     internal class TheoryTech : Technology, ITheoryTech
     {
-        public List<ITechnology> Children { get; }
+        public IReadOnlyCollection<ITechnology> Children { get => _children; }
 
-        internal TheoryTech(int id, TechAreas area, string name, string desc, int cost, int duration) : base(id, area, name, desc, cost, duration)
+        public new void CheckConsistency()
         {
-            Children = new List<ITechnology>();
+            if (_children.Count == 0)
+                throw new ConsistencyException("No siblings in theory tech");
+
+            base.CheckConsistency();
         }
+
+        internal TheoryTech() {}
+        internal TheoryTech(int id, TechAreas area, string name, string desc, int cost, int duration) : base(id, area, name, desc, cost, duration) {}
+
+        internal List<ITechnology> Brood => _children;
+
+        private List<ITechnology> _children = new List<ITechnology>();
     }
 
     internal class AppliedTech : Technology, IAppliedTech
     {
-        public List<ITechEffect> Effects { get; }
-        public ITheoryTech Parent { get; }
+        public IReadOnlyCollection<ITechEffect> Effects { get => _effects; }
+        public ITheoryTech Parent { get; internal set; }
 
+        public new void CheckConsistency()
+        {
+            if (_effects.Count == 0) throw new ConsistencyException("No effects in applied tech");
+            foreach (var item in _effects)
+                item.CheckConsistency();
+
+            base.CheckConsistency();
+        }
+
+        internal AppliedTech() {}
         internal AppliedTech(int id, TechAreas area, string name, string desc, int cost, int duration, ITheoryTech parent) : base(id, area, name, desc, cost, duration)
         {
             Parent = parent;
-            Effects = new List<ITechEffect>();
         }
+
+        internal List<TechEffect> Eff => _effects;
+
+        private List<TechEffect> _effects = new List<TechEffect>();
     }
 }
