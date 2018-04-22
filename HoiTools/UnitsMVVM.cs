@@ -1,12 +1,12 @@
 ﻿using PersistentLayer;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
+using UIControls;
 
 namespace HoiTools
 {
-    public class UnitsMVVM : INotifyPropertyChanged
+    public class UnitsMVVM : Mvvm
     {
         public class CompRow
         {
@@ -34,16 +34,18 @@ namespace HoiTools
             Core.DataChanged += Core_DataChanged;
         }
 
-        public IReadOnlyCollection<UnitTypeName> Types { get => Core.UnitTypes.Types; }// new ObservableCollection<UnitTypeName>(Core.UnitTypes.Types); } }
+        public override void Cleanup()
+        {
+            Core.DataChanged -= Core_DataChanged;
+        }
 
+        public IReadOnlyCollection<UnitTypeName> Types { get => Core.UnitTypes.Types; }
         public UnitTypeName SelectedType
         {
             get { return _selectedType; }
             set { if (_selectedType != value) { _selectedType = value; OnPropertyChanged("Models"); } }
         }
-
         public ObservableCollection<IModel> Models { get { return new ObservableCollection<IModel>(Core.UnitTypes.UnitType(_selectedType).Models); } }
-
         public IModel SelectedModel
         {
             get { return _selectedModel; }
@@ -56,34 +58,12 @@ namespace HoiTools
                 }
             }
         }
-
-        internal void Cleanup()
-        {
-            Core.DataChanged -= Core_DataChanged;
-        }
-
-        private void OnPropertyChanged(string name)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
-
-        private void Core_DataChanged(object sender, string e)
-        {
-            if (e == "All")
-            {
-                SelectedModel = null;
-                OnPropertyChanged("Types");
-                OnPropertyChanged("Models");
-            }
-            else if (e == "CurrentCountry")
-            {
-                OnPropertyChanged("Models");
-            }
-        }
-
         public ObservableCollection<IModel> ComparingModels { get => _comparingModels; }
         public bool CompareEnabled { get => _comparingModels.Count == 2 && !_comparingMode; }
         public bool ComparingMode { get => _comparingMode; }
+        public ObservableCollection<CompRow> ComparisonTable { get => new ObservableCollection<CompRow>(_comparison.Values); }
+        public string FirstComparingModel { get => _comparingModels.Count >= 1 ? _comparingModels[0].Name : ""; }
+        public string SecondComparingModel { get => _comparingModels.Count >= 1 ? _comparingModels[1].Name : ""; }
 
         public void AddToComparison(IModel model)
         {
@@ -95,10 +75,6 @@ namespace HoiTools
             OnPropertyChanged("ComparingModels");
             if (btnUpdate) OnPropertyChanged("CompareEnabled");
         }
-
-        public ObservableCollection<CompRow> ComparisonTable { get => new ObservableCollection<CompRow>(_comparison.Values); }
-        public string FirstComparingModel { get => _comparingModels.Count >= 1 ? _comparingModels[0].Name : ""; }
-        public string SecondComparingModel { get => _comparingModels.Count >= 1 ? _comparingModels[1].Name : ""; }
 
         internal void Compare()
         {
@@ -132,7 +108,19 @@ namespace HoiTools
             OnPropertyChanged("CompareEnabled");
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        private void Core_DataChanged(object sender, string e)
+        {
+            if (e == "All")
+            {
+                SelectedModel = null;
+                OnPropertyChanged("Types");
+                OnPropertyChanged("Models");
+            }
+            else if (e == "CurrentCountry")
+            {
+                OnPropertyChanged("Models");
+            }
+        }
 
         private UnitTypeName _selectedType;
         private IModel _selectedModel;

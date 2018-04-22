@@ -157,7 +157,8 @@ namespace PersistentLayer
 
     public interface ITheoryTech : ITechnology
     {
-        IReadOnlyCollection<ITechnology> Children { get; }
+        IReadOnlyCollection<IAppliedTech> Children { get; }
+        ITheoryTech Next { get; }
     }
 
     public interface IAppliedTech : ITechnology
@@ -310,7 +311,8 @@ namespace PersistentLayer
 
     internal class TheoryTech : Technology, ITheoryTech
     {
-        public IReadOnlyCollection<ITechnology> Children { get => _children; }
+        public IReadOnlyCollection<IAppliedTech> Children { get => _children; }
+        public ITheoryTech Next { get => _next; internal set { _next = value; } }
 
         public new void CheckConsistency()
         {
@@ -330,9 +332,10 @@ namespace PersistentLayer
         internal TheoryTech() {}
         internal TheoryTech(int id, TechAreas area, string name, string desc, int cost, int duration) : base(id, area, name, desc, cost, duration) {}
 
-        internal List<ITechnology> Brood => _children;
+        internal List<IAppliedTech> Brood => _children;
 
-        private List<ITechnology> _children = new List<ITechnology>();
+        private List<IAppliedTech> _children = new List<IAppliedTech>();
+        private ITheoryTech _next;
     }
 
     internal class AppliedTech : Technology, IAppliedTech

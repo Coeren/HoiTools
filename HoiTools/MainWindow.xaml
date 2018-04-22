@@ -37,7 +37,7 @@
                 <local:UnitsControl x:Name="unitsControl" DockPanel.Dock="Top" Margin="5,0,5,0"/>
             </TabItem>
             <TabItem Header="Tech">
-                
+                <local:TechControl DockPanel.Dock="Top" Margin="5,0,5,0"/>
             </TabItem>
         </TabControl>
     </DockPanel>

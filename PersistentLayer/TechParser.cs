@@ -113,8 +113,13 @@ namespace PersistentLayer
                 case States.theory:
                     if (_area.Root == null)
                         _area.SetRoot(_theo);
+                    else if (_lastTheo.Next != null)
+                        throw new ClauzewitzSyntaxException("Duplicated theory successor for " + _lastTheo.Name);
                     else
+                    {
+                        _lastTheo.Next = _theo;
                         _reqs[_theo.Id] = _lastTheo.Id;
+                    }
 
                     _lastTheo = _theo;
                     _mapping[_theo.Id] = _theo;

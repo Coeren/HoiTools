@@ -68,6 +68,7 @@
       <DependentUpon>CommonSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="ConvertBool.cs" />
+    <Compile Include="CustomControl.cs" />
     <Compile Include="PathSelector.xaml.cs">
       <DependentUpon>PathSelector.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -99,6 +100,10 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{0229c8fc-4d05-4512-b766-268050aa99b2}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PersistentLayer\PersistentLayer.csproj">
       <Project>{c5de0051-a6cf-4224-9590-3c63b066f3d2}</Project>
       <Name>PersistentLayer</Name>

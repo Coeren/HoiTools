@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows;
 
 namespace Common
 {
@@ -27,9 +29,22 @@ namespace Common
         }
 
         // Does not work with [flags]
-        public static bool IsValid<T>(this T en)
+        public static bool IsValid<T>(this T en) where T : IConvertible
         {
             return en != null && Enum.IsDefined(typeof(T), en);
+        }
+    }
+
+    public static class Utils
+    {
+        public static bool IsDesigning
+        {
+            get
+            {
+                var prop = DesignerProperties.IsInDesignModeProperty;
+
+                return (bool)DependencyPropertyDescriptor.FromProperty(prop, typeof(FrameworkElement)).Metadata.DefaultValue;
+            }
         }
     }
 }

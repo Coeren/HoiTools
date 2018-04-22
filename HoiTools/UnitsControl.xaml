@@ -1,9 +1,10 @@
-﻿<UserControl x:Class="HoiTools.UnitsControl"
+﻿<uic:CustomControlBase x:TypeArguments="local:UnitsMVVM" x:Class="HoiTools.UnitsControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:uic="clr-namespace:UIControls;assembly=UIControls"
+             xmlns:local="clr-namespace:HoiTools"
              mc:Ignorable="d" d:DesignWidth="416.053" d:DesignHeight="280.144">
     <UserControl.Resources>
         <uic:VisibilityConverter x:Key="ConvertBool"/>
@@ -85,4 +86,4 @@
             </Grid>
         </Grid>
     </Grid>
-</UserControl>
+</uic:CustomControlBase>

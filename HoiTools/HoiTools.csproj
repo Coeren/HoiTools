@@ -76,6 +76,10 @@
     <Compile Include="Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TechControl.xaml.cs">
+      <DependentUpon>TechControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TechMVVM.cs" />
     <Compile Include="UnitsControl.xaml.cs">
       <DependentUpon>UnitsControl.xaml</DependentUpon>
     </Compile>
@@ -93,6 +97,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Settings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TechControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
