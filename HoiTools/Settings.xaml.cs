@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
 
-namespace Units
+namespace HoiTools
 {
     /// <summary>
     /// Interaction logic for Settings.xaml

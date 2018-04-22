@@ -54,9 +54,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Units\Units.csproj">
+    <ProjectReference Include="..\HoiTools\HoiTools.csproj">
       <Project>{6582728d-d9f5-45ce-b81c-920ab1aed616}</Project>
-      <Name>Units</Name>
+      <Name>HoiTools</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

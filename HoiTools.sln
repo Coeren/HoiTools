@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2037
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Units", "Units\Units.csproj", "{6582728D-D9F5-45CE-B81C-920AB1AED616}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HoiTools", "HoiTools\HoiTools.csproj", "{6582728D-D9F5-45CE-B81C-920AB1AED616}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersistentLayer", "PersistentLayer\PersistentLayer.csproj", "{C5DE0051-A6CF-4224-9590-3C63B066F3D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitsTests", "UnitsTests\UnitsTests.csproj", "{F42746D7-3CD5-4F74-8A56-DB72FE5D023B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HoiToolsTests", "HoiToolsTests\HoiToolsTests.csproj", "{F42746D7-3CD5-4F74-8A56-DB72FE5D023B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UIControls", "UIControls\UIControls.csproj", "{562CDF05-D662-4B71-AB99-EED2AC613C1E}"
 EndProject

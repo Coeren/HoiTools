@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Units
+namespace HoiTools
 {
     /// <summary>
     /// Interaction logic for UnitsControl.xaml

@@ -3,7 +3,7 @@ using PersistentLayer;
 using System.Diagnostics;
 using System.Windows;
 
-namespace Units
+namespace HoiTools
 {
     /// <summary>
     /// Interaction logic for App.xaml

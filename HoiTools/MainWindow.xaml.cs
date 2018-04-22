@@ -6,7 +6,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 
-namespace Units
+namespace HoiTools
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

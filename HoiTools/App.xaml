@@ -1,7 +1,7 @@
-﻿<Application x:Class="Units.App"
+﻿<Application x:Class="HoiTools.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:Units"
+             xmlns:local="clr-namespace:HoiTools"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          
